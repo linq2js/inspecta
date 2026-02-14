@@ -8,7 +8,7 @@
     "description": "A horizontal bar at the top of the screen that provides contextual title, navigation controls, and action items.",
     "anatomy": {
       "parts": [
-        { "label": "Leading Icon / Back Button", "description": "Left-aligned navigation control, typically a back arrow or hamburger menu icon." },
+        { "label": "Leading Icon · Back Button", "description": "Left-aligned navigation control, typically a back arrow or hamburger menu icon." },
         { "label": "Title", "description": "Centered or left-aligned text that describes the current screen or section." },
         { "label": "Trailing Actions", "description": "Right-aligned action buttons or icons (e.g., search, share, overflow menu)." },
         { "label": "Background Surface", "description": "The bar background, which may be opaque, translucent, or blurred." }
@@ -28,11 +28,11 @@
       "gestures": ["Swipe from left edge to go back (iOS)", "Scroll to collapse/expand (Android Material)"]
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UINavigationBar", "visualNotes": "Large title style (iOS 11+); translucent with blur effect by default.", "behaviorNotes": "Supports large title that collapses on scroll. Swipe-back gesture from left edge." },
-      { "platform": "macos", "name": "NSToolbar", "visualNotes": "Integrated with the title bar; unified appearance with window controls.", "behaviorNotes": "Can be customized by users; supports flexible/fixed items and overflow." },
-      { "platform": "android", "name": "TopAppBar (Material 3)", "visualNotes": "Left-aligned title by default; supports small, medium, and large variants.", "behaviorNotes": "Scrolling behavior includes pin, scroll-off, and compress. Overflow menu for additional actions." },
-      { "platform": "windows", "name": "TitleBar / CommandBar", "visualNotes": "Often combined with window title bar; uses system accent color.", "behaviorNotes": "Can include back button, title, and command buttons. Supports compact and expanded modes." },
-      { "platform": "web", "name": "Header / Navbar", "visualNotes": "Typically a fixed or sticky header with logo, nav links, and actions.", "behaviorNotes": "Often sticky at top of viewport. May include responsive hamburger menu for mobile." }
+      { "platform": "ios", "name": "UINavigationBar", "visualNotes": "Large title style (iOS 11+); translucent with blur effect by default.", "behaviorNotes": "Supports large title that collapses on scroll. Swipe-back gesture from left edge.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/navigation-bars" },
+      { "platform": "macos", "name": "NSToolbar", "visualNotes": "Integrated with the title bar; unified appearance with window controls.", "behaviorNotes": "Can be customized by users; supports flexible/fixed items and overflow.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/toolbars" },
+      { "platform": "android", "name": "TopAppBar (Material 3)", "visualNotes": "Left-aligned title by default; supports small, medium, and large variants.", "behaviorNotes": "Scrolling behavior includes pin, scroll-off, and compress. Overflow menu for additional actions.", "referenceUrl": "https://m3.material.io/components/top-app-bar/overview" },
+      { "platform": "windows", "name": "TitleBar · CommandBar", "visualNotes": "Often combined with window title bar; uses system accent color.", "behaviorNotes": "Can include back button, title, and command buttons. Supports compact and expanded modes.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/command-bar" },
+      { "platform": "web", "name": "Header · Navbar", "visualNotes": "Typically a fixed or sticky header with logo, nav links, and actions.", "behaviorNotes": "Often sticky at top of viewport. May include responsive hamburger menu for mobile.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/nav" }
     ]
   },
   {
@@ -64,25 +64,25 @@
       "gestures": ["Long-press for context menu (iOS)", "Double-tap to scroll to top (iOS)"]
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UITabBar", "visualNotes": "Bottom bar with filled/outlined icons and labels; translucent background with blur.", "behaviorNotes": "Supports up to 5 visible tabs with a 'More' tab for additional items. Badge support built-in." },
-      { "platform": "android", "name": "NavigationBar (Material 3)", "visualNotes": "Bottom bar with pill-shaped active indicator; icons with optional labels.", "behaviorNotes": "3–5 destinations recommended. Can hide on scroll. Supports badges." },
-      { "platform": "web", "name": "Tab Navigation / Bottom Nav", "visualNotes": "May be top-aligned tabs or bottom navigation on mobile web; styled with CSS.", "behaviorNotes": "Behavior varies widely. Tab-panel ARIA pattern recommended for accessibility." }
+      { "platform": "ios", "name": "UITabBar", "visualNotes": "Bottom bar with filled/outlined icons and labels; translucent background with blur.", "behaviorNotes": "Supports up to 5 visible tabs with a 'More' tab for additional items. Badge support built-in.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/tab-bars" },
+      { "platform": "android", "name": "NavigationBar (Material 3)", "visualNotes": "Bottom bar with pill-shaped active indicator; icons with optional labels.", "behaviorNotes": "3–5 destinations recommended. Can hide on scroll. Supports badges.", "referenceUrl": "https://m3.material.io/components/navigation-bar/overview" },
+      { "platform": "web", "name": "Tab Navigation · Bottom Nav", "visualNotes": "May be top-aligned tabs or bottom navigation on mobile web; styled with CSS.", "behaviorNotes": "Behavior varies widely. Tab-panel ARIA pattern recommended for accessibility.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/tabs/" }
     ]
   },
   {
     "slug": "sidebar",
-    "name": "Sidebar / Navigation Drawer",
+    "name": "Sidebar · Navigation Drawer",
     "alternativeNames": ["Navigation Drawer", "Side Menu", "UISplitViewController", "NavigationView", "Drawer"],
     "platforms": ["ios", "macos", "android", "windows", "web"],
     "category": "navigation",
     "description": "A vertical panel at the side of the screen listing navigation destinations, often collapsible or toggled by a menu icon.",
     "anatomy": {
       "parts": [
-        { "label": "Header / Profile Area", "description": "Optional top section with app logo, user avatar, or account info." },
+        { "label": "Header · Profile Area", "description": "Optional top section with app logo, user avatar, or account info." },
         { "label": "Navigation Items", "description": "Vertically stacked list of destinations, each with icon and label." },
         { "label": "Active Indicator", "description": "Highlight on the currently selected navigation item." },
-        { "label": "Divider / Section Header", "description": "Optional separators grouping related navigation items." },
-        { "label": "Scrim / Overlay", "description": "Semi-transparent backdrop shown when drawer overlays content (modal mode)." }
+        { "label": "Divider · Section Header", "description": "Optional separators grouping related navigation items." },
+        { "label": "Scrim · Overlay", "description": "Semi-transparent backdrop shown when drawer overlays content (modal mode)." }
       ]
     },
     "placement": {
@@ -99,11 +99,11 @@
       "gestures": ["Swipe from left edge to open (Android, iOS)", "Swipe left to close"]
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UISplitViewController sidebar", "visualNotes": "Translucent sidebar in split view; list-style navigation.", "behaviorNotes": "On iPad, shown persistently in landscape; overlays in portrait. On iPhone, collapses to push navigation." },
-      { "platform": "macos", "name": "NSOutlineView sidebar", "visualNotes": "Source list style with disclosure triangles for hierarchy.", "behaviorNotes": "Persistent; can be toggled with the sidebar button. Supports drag-to-resize." },
-      { "platform": "android", "name": "NavigationDrawer (Material 3)", "visualNotes": "Modal drawer slides in from left with rounded corners and active pill indicator.", "behaviorNotes": "Opened via hamburger icon or edge swipe. Scrim overlay blocks content interaction." },
-      { "platform": "windows", "name": "NavigationView", "visualNotes": "Hamburger navigation with compact (icons only) and expanded (icons + labels) states.", "behaviorNotes": "Supports top, left-compact, left-expanded, and minimal display modes." },
-      { "platform": "web", "name": "Sidebar Navigation", "visualNotes": "Fixed or collapsible left panel; often responsive — drawer on mobile, persistent on desktop.", "behaviorNotes": "Toggle via hamburger button. Common pattern: off-canvas for mobile, inline for desktop." }
+      { "platform": "ios", "name": "UISplitViewController sidebar", "visualNotes": "Translucent sidebar in split view; list-style navigation.", "behaviorNotes": "On iPad, shown persistently in landscape; overlays in portrait. On iPhone, collapses to push navigation.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/sidebars" },
+      { "platform": "macos", "name": "NSOutlineView sidebar", "visualNotes": "Source list style with disclosure triangles for hierarchy.", "behaviorNotes": "Persistent; can be toggled with the sidebar button. Supports drag-to-resize.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/sidebars" },
+      { "platform": "android", "name": "NavigationDrawer (Material 3)", "visualNotes": "Modal drawer slides in from left with rounded corners and active pill indicator.", "behaviorNotes": "Opened via hamburger icon or edge swipe. Scrim overlay blocks content interaction.", "referenceUrl": "https://m3.material.io/components/navigation-drawer/overview" },
+      { "platform": "windows", "name": "NavigationView", "visualNotes": "Hamburger navigation with compact (icons only) and expanded (icons + labels) states.", "behaviorNotes": "Supports top, left-compact, left-expanded, and minimal display modes.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/navigationview" },
+      { "platform": "web", "name": "Sidebar Navigation", "visualNotes": "Fixed or collapsible left panel; often responsive — drawer on mobile, persistent on desktop.", "behaviorNotes": "Toggle via hamburger button. Common pattern: off-canvas for mobile, inline for desktop.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/navigation_role" }
     ]
   },
   {
@@ -134,9 +134,9 @@
       "gestures": []
     },
     "platformVariations": [
-      { "platform": "web", "name": "Breadcrumb (HTML nav)", "visualNotes": "Horizontal text links with '>' or '/' separators; uses nav and ol/li elements.", "behaviorNotes": "ARIA breadcrumb landmark. Last item is aria-current='page'." },
-      { "platform": "windows", "name": "BreadcrumbBar", "visualNotes": "WinUI BreadcrumbBar with chevron separators and dropdown overflow.", "behaviorNotes": "Supports overflow with ellipsis dropdown for deep hierarchies." },
-      { "platform": "macos", "name": "Path Bar / NSPathControl", "visualNotes": "Path bar at the bottom of Finder windows showing folder hierarchy.", "behaviorNotes": "Click any component to navigate to that folder; supports drag-and-drop." }
+      { "platform": "web", "name": "Breadcrumb (HTML nav)", "visualNotes": "Horizontal text links with '>' or '/' separators; uses nav and ol/li elements.", "behaviorNotes": "ARIA breadcrumb landmark. Last item is aria-current='page'.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/" },
+      { "platform": "windows", "name": "BreadcrumbBar", "visualNotes": "WinUI BreadcrumbBar with chevron separators and dropdown overflow.", "behaviorNotes": "Supports overflow with ellipsis dropdown for deep hierarchies.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/breadcrumbbar" },
+      { "platform": "macos", "name": "Path Bar · NSPathControl", "visualNotes": "Path bar at the bottom of Finder windows showing folder hierarchy.", "behaviorNotes": "Click any component to navigate to that folder; supports drag-and-drop.", "referenceUrl": "https://developer.apple.com/documentation/appkit/nspathcontrol" }
     ]
   },
   {
@@ -168,9 +168,9 @@
       "gestures": ["Keyboard shortcuts shown next to menu items", "Arrow keys to navigate within menus"]
     },
     "platformVariations": [
-      { "platform": "macos", "name": "NSMenu / Menu Bar", "visualNotes": "System-level menu bar at the top of the screen; shared across all apps.", "behaviorNotes": "Changes based on focused application. Supports system-wide search with Help menu." },
-      { "platform": "windows", "name": "MenuBar / MenuStrip", "visualNotes": "In-window menu bar below the title bar; uses system font.", "behaviorNotes": "Activates on Alt key press. Supports underline mnemonics for keyboard access." },
-      { "platform": "web", "name": "Menu Bar (ARIA)", "visualNotes": "Custom-styled horizontal menu; often part of web-based IDEs or document editors.", "behaviorNotes": "Should implement ARIA menubar role with keyboard navigation for accessibility." }
+      { "platform": "macos", "name": "NSMenu · Menu Bar", "visualNotes": "System-level menu bar at the top of the screen; shared across all apps.", "behaviorNotes": "Changes based on focused application. Supports system-wide search with Help menu.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/menus" },
+      { "platform": "windows", "name": "MenuBar · MenuStrip", "visualNotes": "In-window menu bar below the title bar; uses system font.", "behaviorNotes": "Activates on Alt key press. Supports underline mnemonics for keyboard access.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/menus" },
+      { "platform": "web", "name": "Menu Bar (ARIA)", "visualNotes": "Custom-styled horizontal menu; often part of web-based IDEs or document editors.", "behaviorNotes": "Should implement ARIA menubar role with keyboard navigation for accessibility.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/menubar/" }
     ]
   },
   {
@@ -202,11 +202,11 @@
       "gestures": ["Tap (mobile)", "Click (desktop)", "Enter/Space key (keyboard)"]
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UIButton", "visualNotes": "Multiple styles: plain, gray, tinted, filled. Rounded corners with system colors.", "behaviorNotes": "Supports haptic feedback on press. Dynamic Type for text scaling." },
-      { "platform": "macos", "name": "NSButton", "visualNotes": "Push button, checkbox, radio, toggle variants. Standard macOS chrome appearance.", "behaviorNotes": "Keyboard accessible via Tab and Space. Supports bevel, round, and recessed styles." },
-      { "platform": "android", "name": "Button (Material 3)", "visualNotes": "Filled, outlined, text, elevated, and tonal variants with rounded corners.", "behaviorNotes": "Ripple effect on press. Supports icon buttons and extended FAB-like buttons." },
-      { "platform": "windows", "name": "Button (WinUI)", "visualNotes": "Rounded rectangle with Fluent Design reveal highlight on hover.", "behaviorNotes": "Supports accent styling for primary actions. Keyboard accessible." },
-      { "platform": "web", "name": "button / a element", "visualNotes": "Styling varies widely by framework. Typically filled or outlined with hover transitions.", "behaviorNotes": "Must be a <button> for actions (not <div>). ARIA role=button for non-semantic elements." }
+      { "platform": "ios", "name": "UIButton", "visualNotes": "Multiple styles: plain, gray, tinted, filled. Rounded corners with system colors.", "behaviorNotes": "Supports haptic feedback on press. Dynamic Type for text scaling.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/buttons" },
+      { "platform": "macos", "name": "NSButton", "visualNotes": "Push button, checkbox, radio, toggle variants. Standard macOS chrome appearance.", "behaviorNotes": "Keyboard accessible via Tab and Space. Supports bevel, round, and recessed styles.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/buttons" },
+      { "platform": "android", "name": "Button (Material 3)", "visualNotes": "Filled, outlined, text, elevated, and tonal variants with rounded corners.", "behaviorNotes": "Ripple effect on press. Supports icon buttons and extended FAB-like buttons.", "referenceUrl": "https://m3.material.io/components/buttons/overview" },
+      { "platform": "windows", "name": "Button (WinUI)", "visualNotes": "Rounded rectangle with Fluent Design reveal highlight on hover.", "behaviorNotes": "Supports accent styling for primary actions. Keyboard accessible.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/buttons" },
+      { "platform": "web", "name": "button · a element", "visualNotes": "Styling varies widely by framework. Typically filled or outlined with hover transitions.", "behaviorNotes": "Must be a <button> for actions (not <div>). ARIA role=button for non-semantic elements.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button" }
     ]
   },
   {
@@ -223,7 +223,7 @@
         { "label": "Placeholder Text", "description": "Hint text shown when the field is empty." },
         { "label": "Leading/Trailing Icon", "description": "Optional icons for context (search icon) or actions (clear button)." },
         { "label": "Helper/Error Text", "description": "Supporting text below the field for validation feedback." },
-        { "label": "Border / Underline", "description": "Visual boundary of the input area; may change on focus." }
+        { "label": "Border · Underline", "description": "Visual boundary of the input area; may change on focus." }
       ]
     },
     "placement": {
@@ -240,11 +240,11 @@
       "gestures": ["Tap to focus and show keyboard (mobile)", "Long-press for text selection"]
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UITextField / UITextView", "visualNotes": "Rounded rectangle with light gray background; floating label support in forms.", "behaviorNotes": "Shows system keyboard on focus. Supports autocomplete, secure entry, and content type hints." },
-      { "platform": "macos", "name": "NSTextField", "visualNotes": "Bordered or borderless text field; system font and styling.", "behaviorNotes": "Supports undo/redo, spell check, and dictation. Tab to navigate between fields." },
-      { "platform": "android", "name": "TextField (Material 3)", "visualNotes": "Filled or outlined variant; floating label that animates up on focus.", "behaviorNotes": "Shows soft keyboard on focus. Supports input types, error states, and character counters." },
-      { "platform": "windows", "name": "TextBox (WinUI)", "visualNotes": "Flat design with bottom border emphasis; header label support.", "behaviorNotes": "Supports placeholder text, spell checking, and input validation." },
-      { "platform": "web", "name": "input[type=text] / textarea", "visualNotes": "Default browser styling varies; typically styled with CSS frameworks.", "behaviorNotes": "Supports HTML5 validation attributes (required, pattern, maxlength). ARIA labels for accessibility." }
+      { "platform": "ios", "name": "UITextField · UITextView", "visualNotes": "Rounded rectangle with light gray background; floating label support in forms.", "behaviorNotes": "Shows system keyboard on focus. Supports autocomplete, secure entry, and content type hints.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/text-fields" },
+      { "platform": "macos", "name": "NSTextField", "visualNotes": "Bordered or borderless text field; system font and styling.", "behaviorNotes": "Supports undo/redo, spell check, and dictation. Tab to navigate between fields.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/text-fields" },
+      { "platform": "android", "name": "TextField (Material 3)", "visualNotes": "Filled or outlined variant; floating label that animates up on focus.", "behaviorNotes": "Shows soft keyboard on focus. Supports input types, error states, and character counters.", "referenceUrl": "https://m3.material.io/components/text-fields/overview" },
+      { "platform": "windows", "name": "TextBox (WinUI)", "visualNotes": "Flat design with bottom border emphasis; header label support.", "behaviorNotes": "Supports placeholder text, spell checking, and input validation.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/text-box" },
+      { "platform": "web", "name": "input[type=text] · textarea", "visualNotes": "Default browser styling varies; typically styled with CSS frameworks.", "behaviorNotes": "Supports HTML5 validation attributes (required, pattern, maxlength). ARIA labels for accessibility.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/text" }
     ]
   },
   {
@@ -275,16 +275,16 @@
       "gestures": ["Tap to toggle (mobile)", "Click or Space key to toggle (desktop)"]
     },
     "platformVariations": [
-      { "platform": "ios", "name": "Checkmark in UITableViewCell", "visualNotes": "iOS does not have a native checkbox; uses checkmark accessory in list rows or toggle switches.", "behaviorNotes": "Tap the row to toggle checkmark. Often replaced with UISwitch for single toggles." },
-      { "platform": "macos", "name": "NSButton (checkbox style)", "visualNotes": "Standard checkbox with system styling; square with rounded corners.", "behaviorNotes": "Supports mixed (indeterminate) state. Keyboard toggleable with Space." },
-      { "platform": "android", "name": "Checkbox (Material 3)", "visualNotes": "Rounded square with animated checkmark; supports error state.", "behaviorNotes": "Ripple effect on toggle. Can be part of a checkbox group." },
-      { "platform": "windows", "name": "CheckBox (WinUI)", "visualNotes": "Square with Fluent Design; animated check/uncheck transitions.", "behaviorNotes": "Supports three states: checked, unchecked, indeterminate." },
-      { "platform": "web", "name": "input[type=checkbox]", "visualNotes": "Browser-default or custom-styled square box; varies widely by browser.", "behaviorNotes": "Supports indeterminate state via JavaScript. Associate with label via for/id for accessibility." }
+      { "platform": "ios", "name": "Checkmark in UITableViewCell", "visualNotes": "iOS does not have a native checkbox; uses checkmark accessory in list rows or toggle switches.", "behaviorNotes": "Tap the row to toggle checkmark. Often replaced with UISwitch for single toggles.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/toggles" },
+      { "platform": "macos", "name": "NSButton (checkbox style)", "visualNotes": "Standard checkbox with system styling; square with rounded corners.", "behaviorNotes": "Supports mixed (indeterminate) state. Keyboard toggleable with Space.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/toggles" },
+      { "platform": "android", "name": "Checkbox (Material 3)", "visualNotes": "Rounded square with animated checkmark; supports error state.", "behaviorNotes": "Ripple effect on toggle. Can be part of a checkbox group.", "referenceUrl": "https://m3.material.io/components/checkbox/overview" },
+      { "platform": "windows", "name": "CheckBox (WinUI)", "visualNotes": "Square with Fluent Design; animated check/uncheck transitions.", "behaviorNotes": "Supports three states: checked, unchecked, indeterminate.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/checkbox" },
+      { "platform": "web", "name": "input[type=checkbox]", "visualNotes": "Browser-default or custom-styled square box; varies widely by browser.", "behaviorNotes": "Supports indeterminate state via JavaScript. Associate with label via for/id for accessibility.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox" }
     ]
   },
   {
     "slug": "toggle-switch",
-    "name": "Toggle / Switch",
+    "name": "Toggle · Switch",
     "alternativeNames": ["Switch", "UISwitch", "Toggle Switch", "ToggleSwitch", "On/Off Switch"],
     "platforms": ["ios", "macos", "android", "windows", "web"],
     "category": "input",
@@ -311,23 +311,23 @@
       "gestures": ["Tap to toggle", "Drag thumb to slide (iOS, Android)"]
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UISwitch", "visualNotes": "Green track when on, gray when off; white circular thumb.", "behaviorNotes": "Immediate effect (no save button needed). Haptic feedback on toggle." },
-      { "platform": "macos", "name": "NSSwitch", "visualNotes": "Similar to iOS switch; smaller size for desktop context.", "behaviorNotes": "Click to toggle. No drag interaction on macOS." },
-      { "platform": "android", "name": "Switch (Material 3)", "visualNotes": "Track with a thumb that includes an optional icon; color changes on state.", "behaviorNotes": "Drag or tap to toggle. May show icon inside the thumb." },
-      { "platform": "windows", "name": "ToggleSwitch (WinUI)", "visualNotes": "Rectangular track with 'On'/'Off' text labels and sliding circle.", "behaviorNotes": "Click to toggle. Supports header text and on/off content labels." },
-      { "platform": "web", "name": "Custom switch / role=switch", "visualNotes": "Custom CSS slider, often mimicking iOS or Material style.", "behaviorNotes": "Use role='switch' and aria-checked for accessibility. Toggle on click and Space/Enter." }
+      { "platform": "ios", "name": "UISwitch", "visualNotes": "Green track when on, gray when off; white circular thumb.", "behaviorNotes": "Immediate effect (no save button needed). Haptic feedback on toggle.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/toggles" },
+      { "platform": "macos", "name": "NSSwitch", "visualNotes": "Similar to iOS switch; smaller size for desktop context.", "behaviorNotes": "Click to toggle. No drag interaction on macOS.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/toggles" },
+      { "platform": "android", "name": "Switch (Material 3)", "visualNotes": "Track with a thumb that includes an optional icon; color changes on state.", "behaviorNotes": "Drag or tap to toggle. May show icon inside the thumb.", "referenceUrl": "https://m3.material.io/components/switch/overview" },
+      { "platform": "windows", "name": "ToggleSwitch (WinUI)", "visualNotes": "Rectangular track with 'On'/'Off' text labels and sliding circle.", "behaviorNotes": "Click to toggle. Supports header text and on/off content labels.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/toggles" },
+      { "platform": "web", "name": "Custom switch · role=switch", "visualNotes": "Custom CSS slider, often mimicking iOS or Material style.", "behaviorNotes": "Use role='switch' and aria-checked for accessibility. Toggle on click and Space/Enter.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/switch/" }
     ]
   },
   {
     "slug": "dropdown-select",
-    "name": "Dropdown / Select",
+    "name": "Dropdown · Select",
     "alternativeNames": ["Picker", "UIPickerView", "Spinner", "ComboBox", "Select Menu", "DropdownMenu"],
     "platforms": ["ios", "macos", "android", "windows", "web"],
     "category": "input",
     "description": "A control that lets users choose one option from a dropdown list that appears on interaction.",
     "anatomy": {
       "parts": [
-        { "label": "Trigger / Button", "description": "The visible element showing the current selection and a dropdown indicator." },
+        { "label": "Trigger · Button", "description": "The visible element showing the current selection and a dropdown indicator." },
         { "label": "Dropdown List", "description": "The expandable list of options that appears on interaction." },
         { "label": "Option Item", "description": "Individual selectable item within the list." },
         { "label": "Selected Indicator", "description": "Checkmark or highlight on the currently selected option." },
@@ -348,11 +348,11 @@
       "gestures": ["Scroll within dropdown", "Type-ahead search (desktop)"]
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UIMenu / UIPickerView", "visualNotes": "Context menu style dropdown or spinning wheel picker for dates and values.", "behaviorNotes": "Menu picker appears as a popover; wheel picker scrolls with haptic detents." },
-      { "platform": "macos", "name": "NSPopUpButton", "visualNotes": "Pop-up button with beveled appearance; dropdown appears below.", "behaviorNotes": "Supports pull-down and pop-up modes. Arrow keys to navigate options." },
-      { "platform": "android", "name": "ExposedDropdownMenu (Material 3)", "visualNotes": "Text field with trailing icon; dropdown list appears below the field.", "behaviorNotes": "Supports filtering as the user types. Uses menu anchor pattern." },
-      { "platform": "windows", "name": "ComboBox (WinUI)", "visualNotes": "Input field with dropdown arrow; may support editable text.", "behaviorNotes": "Supports type-ahead and editable combobox patterns." },
-      { "platform": "web", "name": "select element / custom dropdown", "visualNotes": "Native select element or custom dropdown with styled options.", "behaviorNotes": "Native select is accessible but limited in styling. Custom dropdowns need ARIA listbox role." }
+      { "platform": "ios", "name": "UIMenu · UIPickerView", "visualNotes": "Context menu style dropdown or spinning wheel picker for dates and values.", "behaviorNotes": "Menu picker appears as a popover; wheel picker scrolls with haptic detents.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/pickers" },
+      { "platform": "macos", "name": "NSPopUpButton", "visualNotes": "Pop-up button with beveled appearance; dropdown appears below.", "behaviorNotes": "Supports pull-down and pop-up modes. Arrow keys to navigate options.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/pop-up-buttons" },
+      { "platform": "android", "name": "ExposedDropdownMenu (Material 3)", "visualNotes": "Text field with trailing icon; dropdown list appears below the field.", "behaviorNotes": "Supports filtering as the user types. Uses menu anchor pattern.", "referenceUrl": "https://m3.material.io/components/menus/overview" },
+      { "platform": "windows", "name": "ComboBox (WinUI)", "visualNotes": "Input field with dropdown arrow; may support editable text.", "behaviorNotes": "Supports type-ahead and editable combobox patterns.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/combo-box" },
+      { "platform": "web", "name": "select element · custom dropdown", "visualNotes": "Native select element or custom dropdown with styled options.", "behaviorNotes": "Native select is accessible but limited in styling. Custom dropdowns need ARIA listbox role.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select" }
     ]
   },
   {
@@ -385,11 +385,11 @@
       "gestures": ["Drag thumb (all platforms)", "Tap on track to jump (varies by platform)"]
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UISlider", "visualNotes": "Thin track with circular thumb; blue filled track, gray unfilled.", "behaviorNotes": "Continuous by default. Supports custom min/max images." },
-      { "platform": "macos", "name": "NSSlider", "visualNotes": "Horizontal or vertical; supports linear and circular variants.", "behaviorNotes": "Supports tick marks and snapping to discrete values." },
-      { "platform": "android", "name": "Slider (Material 3)", "visualNotes": "Track with colored fill; supports value label tooltip on drag.", "behaviorNotes": "Discrete steps with tick marks or continuous. Range slider (two thumbs) available." },
-      { "platform": "windows", "name": "Slider (WinUI)", "visualNotes": "Track with thumb; supports tick marks and step increments.", "behaviorNotes": "Arrow keys for fine adjustment. Supports range mode." },
-      { "platform": "web", "name": "input[type=range]", "visualNotes": "Browser-default slider; widely customized with CSS.", "behaviorNotes": "Supports min, max, step attributes. ARIA slider role for custom implementations." }
+      { "platform": "ios", "name": "UISlider", "visualNotes": "Thin track with circular thumb; blue filled track, gray unfilled.", "behaviorNotes": "Continuous by default. Supports custom min/max images.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/sliders" },
+      { "platform": "macos", "name": "NSSlider", "visualNotes": "Horizontal or vertical; supports linear and circular variants.", "behaviorNotes": "Supports tick marks and snapping to discrete values.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/sliders" },
+      { "platform": "android", "name": "Slider (Material 3)", "visualNotes": "Track with colored fill; supports value label tooltip on drag.", "behaviorNotes": "Discrete steps with tick marks or continuous. Range slider (two thumbs) available.", "referenceUrl": "https://m3.material.io/components/sliders/overview" },
+      { "platform": "windows", "name": "Slider (WinUI)", "visualNotes": "Track with thumb; supports tick marks and step increments.", "behaviorNotes": "Arrow keys for fine adjustment. Supports range mode.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/slider" },
+      { "platform": "web", "name": "input[type=range]", "visualNotes": "Browser-default slider; widely customized with CSS.", "behaviorNotes": "Supports min, max, step attributes. ARIA slider role for custom implementations.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/range" }
     ]
   },
   {
@@ -404,7 +404,7 @@
         { "label": "Title", "description": "Brief heading describing the alert purpose." },
         { "label": "Message Body", "description": "Detailed description or question for the user." },
         { "label": "Action Buttons", "description": "Buttons for user response (e.g., OK, Cancel, Delete)." },
-        { "label": "Scrim / Backdrop", "description": "Dimmed background overlay indicating modal state." }
+        { "label": "Scrim · Backdrop", "description": "Dimmed background overlay indicating modal state." }
       ]
     },
     "placement": {
@@ -421,16 +421,16 @@
       "gestures": []
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UIAlertController (.alert)", "visualNotes": "Centered rounded rectangle with blurred background; stacked or side-by-side buttons.", "behaviorNotes": "Blocks interaction until dismissed. Supports text fields for input prompts." },
-      { "platform": "macos", "name": "NSAlert", "visualNotes": "Sheet attached to window or centered modal; includes app icon.", "behaviorNotes": "Supports informational, warning, and critical styles. Dismisses with button click or Enter/Escape." },
-      { "platform": "android", "name": "AlertDialog (Material 3)", "visualNotes": "Rounded card with headline, body, and full-width action buttons; supports hero icon.", "behaviorNotes": "Scrim overlay blocks interaction. Can include custom content, lists, or date pickers." },
-      { "platform": "windows", "name": "ContentDialog (WinUI)", "visualNotes": "Centered dialog with title, content, and up to three buttons.", "behaviorNotes": "Dimmed overlay. Supports primary, secondary, and close button styles." },
-      { "platform": "web", "name": "dialog element / modal", "visualNotes": "Native dialog element or custom modal with backdrop; varies by framework.", "behaviorNotes": "Use <dialog> with showModal() for proper focus trapping and Escape key handling." }
+      { "platform": "ios", "name": "UIAlertController (.alert)", "visualNotes": "Centered rounded rectangle with blurred background; stacked or side-by-side buttons.", "behaviorNotes": "Blocks interaction until dismissed. Supports text fields for input prompts.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/alerts" },
+      { "platform": "macos", "name": "NSAlert", "visualNotes": "Sheet attached to window or centered modal; includes app icon.", "behaviorNotes": "Supports informational, warning, and critical styles. Dismisses with button click or Enter/Escape.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/alerts" },
+      { "platform": "android", "name": "AlertDialog (Material 3)", "visualNotes": "Rounded card with headline, body, and full-width action buttons; supports hero icon.", "behaviorNotes": "Scrim overlay blocks interaction. Can include custom content, lists, or date pickers.", "referenceUrl": "https://m3.material.io/components/dialogs/overview" },
+      { "platform": "windows", "name": "ContentDialog (WinUI)", "visualNotes": "Centered dialog with title, content, and up to three buttons.", "behaviorNotes": "Dimmed overlay. Supports primary, secondary, and close button styles.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/dialogs-and-flyouts/dialogs" },
+      { "platform": "web", "name": "dialog element · modal", "visualNotes": "Native dialog element or custom modal with backdrop; varies by framework.", "behaviorNotes": "Use <dialog> with showModal() for proper focus trapping and Escape key handling.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog" }
     ]
   },
   {
     "slug": "toast-snackbar",
-    "name": "Toast / Snackbar",
+    "name": "Toast · Snackbar",
     "alternativeNames": ["Toast", "Snackbar", "Notification Bar", "Flash Message", "Inline Alert"],
     "platforms": ["ios", "android", "windows", "web"],
     "category": "feedback",
@@ -439,7 +439,7 @@
       "parts": [
         { "label": "Message Text", "description": "Brief text describing the result or status." },
         { "label": "Action Button", "description": "Optional single action like Undo or Retry." },
-        { "label": "Close / Dismiss Icon", "description": "Optional X button for manual dismissal." },
+        { "label": "Close · Dismiss Icon", "description": "Optional X button for manual dismissal." },
         { "label": "Container", "description": "The message background, typically a dark or colored bar." }
       ]
     },
@@ -458,9 +458,9 @@
     },
     "platformVariations": [
       { "platform": "ios", "name": "Custom Toast (no native API)", "visualNotes": "iOS has no native toast. Often shown as a banner at the top or a pill at the bottom.", "behaviorNotes": "Typically custom implementation. System uses banner notifications for similar purpose." },
-      { "platform": "android", "name": "Snackbar (Material 3)", "visualNotes": "Dark container at the bottom with white text; may include one action.", "behaviorNotes": "Auto-dismisses; supports swipe-to-dismiss and action button. Stacks above FAB." },
-      { "platform": "windows", "name": "InfoBar (WinUI)", "visualNotes": "Inline bar at the top of a page section; supports info, warning, error, success severities.", "behaviorNotes": "Persistent until dismissed by user or programmatically. Not a transient toast." },
-      { "platform": "web", "name": "Toast / Notification", "visualNotes": "Typically fixed to a corner (bottom-right or top-right); styled cards that stack.", "behaviorNotes": "Auto-dismiss with timer. Uses ARIA role='status' or role='alert' for accessibility." }
+      { "platform": "android", "name": "Snackbar (Material 3)", "visualNotes": "Dark container at the bottom with white text; may include one action.", "behaviorNotes": "Auto-dismisses; supports swipe-to-dismiss and action button. Stacks above FAB.", "referenceUrl": "https://m3.material.io/components/snackbar/overview" },
+      { "platform": "windows", "name": "InfoBar (WinUI)", "visualNotes": "Inline bar at the top of a page section; supports info, warning, error, success severities.", "behaviorNotes": "Persistent until dismissed by user or programmatically. Not a transient toast.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/infobar" },
+      { "platform": "web", "name": "Toast · Notification", "visualNotes": "Typically fixed to a corner (bottom-right or top-right); styled cards that stack.", "behaviorNotes": "Auto-dismiss with timer. Uses ARIA role='status' or role='alert' for accessibility.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/alert/" }
     ]
   },
   {
@@ -473,8 +473,8 @@
     "anatomy": {
       "parts": [
         { "label": "Track", "description": "The background bar representing the total range." },
-        { "label": "Fill / Indicator", "description": "The colored portion showing current progress." },
-        { "label": "Label / Percentage", "description": "Optional text indicating progress value." }
+        { "label": "Fill · Indicator", "description": "The colored portion showing current progress." },
+        { "label": "Label · Percentage", "description": "Optional text indicating progress value." }
       ]
     },
     "placement": {
@@ -491,16 +491,16 @@
       "gestures": []
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UIProgressView", "visualNotes": "Thin horizontal bar (2-4pt height); tinted fill on gray track.", "behaviorNotes": "Supports determinate progress with 0.0–1.0 value. Smooth animated transitions." },
-      { "platform": "macos", "name": "NSProgressIndicator (bar)", "visualNotes": "Horizontal bar with system blue fill; may include text label.", "behaviorNotes": "Supports determinate and indeterminate modes. Integrates with NSProgress." },
-      { "platform": "android", "name": "LinearProgressIndicator (Material 3)", "visualNotes": "Thin bar with rounded ends; determinate or indeterminate wave animation.", "behaviorNotes": "Can be placed at the top of a screen as a loading indicator." },
-      { "platform": "windows", "name": "ProgressBar (WinUI)", "visualNotes": "Horizontal bar with Fluent Design; supports determinate and indeterminate.", "behaviorNotes": "Indeterminate shows a looping animation. Can display error and paused states." },
-      { "platform": "web", "name": "progress element / custom bar", "visualNotes": "Native progress element or custom div-based bar with CSS transitions.", "behaviorNotes": "Use <progress> element with value and max attributes. ARIA progressbar for custom." }
+      { "platform": "ios", "name": "UIProgressView", "visualNotes": "Thin horizontal bar (2-4pt height); tinted fill on gray track.", "behaviorNotes": "Supports determinate progress with 0.0–1.0 value. Smooth animated transitions.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/progress-indicators" },
+      { "platform": "macos", "name": "NSProgressIndicator (bar)", "visualNotes": "Horizontal bar with system blue fill; may include text label.", "behaviorNotes": "Supports determinate and indeterminate modes. Integrates with NSProgress.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/progress-indicators" },
+      { "platform": "android", "name": "LinearProgressIndicator (Material 3)", "visualNotes": "Thin bar with rounded ends; determinate or indeterminate wave animation.", "behaviorNotes": "Can be placed at the top of a screen as a loading indicator.", "referenceUrl": "https://m3.material.io/components/progress-indicators/overview" },
+      { "platform": "windows", "name": "ProgressBar (WinUI)", "visualNotes": "Horizontal bar with Fluent Design; supports determinate and indeterminate.", "behaviorNotes": "Indeterminate shows a looping animation. Can display error and paused states.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/progress-controls" },
+      { "platform": "web", "name": "progress element · custom bar", "visualNotes": "Native progress element or custom div-based bar with CSS transitions.", "behaviorNotes": "Use <progress> element with value and max attributes. ARIA progressbar for custom.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/progress" }
     ]
   },
   {
     "slug": "spinner",
-    "name": "Spinner / Activity Indicator",
+    "name": "Spinner · Activity Indicator",
     "alternativeNames": ["Activity Indicator", "UIActivityIndicatorView", "CircularProgressIndicator", "Loading Spinner", "ProgressRing"],
     "platforms": ["ios", "macos", "android", "windows", "web"],
     "category": "feedback",
@@ -526,11 +526,11 @@
       "gestures": []
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UIActivityIndicatorView", "visualNotes": "Spinning daisy wheel in white or gray; medium and large sizes.", "behaviorNotes": "Hides automatically when stopped. Often centered in a view or inside navigation." },
-      { "platform": "macos", "name": "NSProgressIndicator (spinning)", "visualNotes": "Spinning gear/flower icon; standard macOS system appearance.", "behaviorNotes": "Small and regular sizes. Used in toolbars and content areas." },
-      { "platform": "android", "name": "CircularProgressIndicator (Material 3)", "visualNotes": "Arc that rotates and sweeps; supports determinate (percentage) mode.", "behaviorNotes": "Indeterminate animation loops continuously. Can also show determinate progress." },
-      { "platform": "windows", "name": "ProgressRing (WinUI)", "visualNotes": "Circular ring with orbiting dots; supports determinate fill mode.", "behaviorNotes": "Indeterminate shows chasing dots; determinate shows arc fill. Supports text content inside." },
-      { "platform": "web", "name": "CSS spinner / SVG animation", "visualNotes": "Typically a CSS-animated border-radius circle or SVG arc rotation.", "behaviorNotes": "Use ARIA role='progressbar' or role='status' with aria-busy for accessibility." }
+      { "platform": "ios", "name": "UIActivityIndicatorView", "visualNotes": "Spinning daisy wheel in white or gray; medium and large sizes.", "behaviorNotes": "Hides automatically when stopped. Often centered in a view or inside navigation.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/progress-indicators" },
+      { "platform": "macos", "name": "NSProgressIndicator (spinning)", "visualNotes": "Spinning gear/flower icon; standard macOS system appearance.", "behaviorNotes": "Small and regular sizes. Used in toolbars and content areas.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/progress-indicators" },
+      { "platform": "android", "name": "CircularProgressIndicator (Material 3)", "visualNotes": "Arc that rotates and sweeps; supports determinate (percentage) mode.", "behaviorNotes": "Indeterminate animation loops continuously. Can also show determinate progress.", "referenceUrl": "https://m3.material.io/components/progress-indicators/overview" },
+      { "platform": "windows", "name": "ProgressRing (WinUI)", "visualNotes": "Circular ring with orbiting dots; supports determinate fill mode.", "behaviorNotes": "Indeterminate shows chasing dots; determinate shows arc fill. Supports text content inside.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/progress-controls" },
+      { "platform": "web", "name": "CSS spinner · SVG animation", "visualNotes": "Typically a CSS-animated border-radius circle or SVG arc rotation.", "behaviorNotes": "Use ARIA role='progressbar' or role='status' with aria-busy for accessibility.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/progressbar_role" }
     ]
   },
   {
@@ -561,10 +561,10 @@
       "gestures": []
     },
     "platformVariations": [
-      { "platform": "ios", "name": "Badge on UITabBarItem / app icon", "visualNotes": "Red circle with white count text; dot variant for minimal indication.", "behaviorNotes": "Automatically managed by the system for app icon badges. Tab bar badges set programmatically." },
-      { "platform": "macos", "name": "Dock badge / NSSBadge", "visualNotes": "Red circle on Dock app icon; badge count in menu bar items.", "behaviorNotes": "Set via NSDockTile API. Sidebar badges show as rounded pill with count." },
-      { "platform": "android", "name": "Badge (Material 3)", "visualNotes": "Small dot or number badge on navigation items; positioned at top-right.", "behaviorNotes": "Supports small (dot) and large (number) variants. Anchored to navigation items." },
-      { "platform": "windows", "name": "InfoBadge (WinUI)", "visualNotes": "Dot, icon, or count badge with attention, informational, success, caution, and critical styles.", "behaviorNotes": "Can be placed on NavigationViewItem or other elements. Supports multiple severity levels." },
+      { "platform": "ios", "name": "Badge on UITabBarItem · app icon", "visualNotes": "Red circle with white count text; dot variant for minimal indication.", "behaviorNotes": "Automatically managed by the system for app icon badges. Tab bar badges set programmatically." },
+      { "platform": "macos", "name": "Dock badge · NSSBadge", "visualNotes": "Red circle on Dock app icon; badge count in menu bar items.", "behaviorNotes": "Set via NSDockTile API. Sidebar badges show as rounded pill with count." },
+      { "platform": "android", "name": "Badge (Material 3)", "visualNotes": "Small dot or number badge on navigation items; positioned at top-right.", "behaviorNotes": "Supports small (dot) and large (number) variants. Anchored to navigation items.", "referenceUrl": "https://m3.material.io/components/badges/overview" },
+      { "platform": "windows", "name": "InfoBadge (WinUI)", "visualNotes": "Dot, icon, or count badge with attention, informational, success, caution, and critical styles.", "behaviorNotes": "Can be placed on NavigationViewItem or other elements. Supports multiple severity levels.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/info-badge" },
       { "platform": "web", "name": "Badge (CSS)", "visualNotes": "Custom-styled span positioned absolute over parent element.", "behaviorNotes": "Use aria-label to convey badge count to screen readers. Not interactive." }
     ]
   },
@@ -580,8 +580,8 @@
         { "label": "Container", "description": "The visible dialog window or sheet with content." },
         { "label": "Header", "description": "Title bar with title text and close/done buttons." },
         { "label": "Content Area", "description": "The main body where forms, information, or media are displayed." },
-        { "label": "Footer / Actions", "description": "Action buttons at the bottom (Save, Cancel, etc.)." },
-        { "label": "Scrim / Backdrop", "description": "Dimmed or blurred overlay behind the modal." }
+        { "label": "Footer · Actions", "description": "Action buttons at the bottom (Save, Cancel, etc.)." },
+        { "label": "Scrim · Backdrop", "description": "Dimmed or blurred overlay behind the modal." }
       ]
     },
     "placement": {
@@ -598,11 +598,11 @@
       "gestures": ["Swipe down to dismiss (iOS sheet)", "Tap scrim to dismiss (some platforms)"]
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UISheetPresentationController / modal", "visualNotes": "Bottom sheet with drag indicator and detents (medium/large); or full-screen modal.", "behaviorNotes": "Sheet style supports half-height and full-height detents. Swipe down to dismiss." },
-      { "platform": "macos", "name": "NSWindow sheet / modal", "visualNotes": "Sheet slides down from parent window title bar; modal is centered window.", "behaviorNotes": "Sheets are attached to a window. Modals block app-wide interaction." },
-      { "platform": "android", "name": "FullScreenDialog / BottomSheetDialog (Material 3)", "visualNotes": "Full-screen dialog with top bar or bottom sheet with drag handle.", "behaviorNotes": "Full-screen dialog uses close icon (X) and action in top bar. Bottom sheet can be dragged." },
-      { "platform": "windows", "name": "ContentDialog (WinUI)", "visualNotes": "Centered dialog with smoke overlay; max width constrained.", "behaviorNotes": "Blocks underlying content. Supports primary, secondary, and close buttons." },
-      { "platform": "web", "name": "dialog / modal overlay", "visualNotes": "Custom modal with backdrop; varies from small centered cards to full-screen overlays.", "behaviorNotes": "Use <dialog> showModal() for proper focus trapping, backdrop, and Escape key support." }
+      { "platform": "ios", "name": "UISheetPresentationController · modal", "visualNotes": "Bottom sheet with drag indicator and detents (medium/large); or full-screen modal.", "behaviorNotes": "Sheet style supports half-height and full-height detents. Swipe down to dismiss.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/sheets" },
+      { "platform": "macos", "name": "NSWindow sheet · modal", "visualNotes": "Sheet slides down from parent window title bar; modal is centered window.", "behaviorNotes": "Sheets are attached to a window. Modals block app-wide interaction.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/sheets" },
+      { "platform": "android", "name": "FullScreenDialog · BottomSheetDialog (Material 3)", "visualNotes": "Full-screen dialog with top bar or bottom sheet with drag handle.", "behaviorNotes": "Full-screen dialog uses close icon (X) and action in top bar. Bottom sheet can be dragged.", "referenceUrl": "https://m3.material.io/components/bottom-sheets/overview" },
+      { "platform": "windows", "name": "ContentDialog (WinUI)", "visualNotes": "Centered dialog with smoke overlay; max width constrained.", "behaviorNotes": "Blocks underlying content. Supports primary, secondary, and close buttons.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/dialogs-and-flyouts/dialogs" },
+      { "platform": "web", "name": "dialog · modal overlay", "visualNotes": "Custom modal with backdrop; varies from small centered cards to full-screen overlays.", "behaviorNotes": "Use <dialog> showModal() for proper focus trapping, backdrop, and Escape key support.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog" }
     ]
   },
   {
@@ -614,7 +614,7 @@
     "description": "A small overlay that appears next to a trigger element, showing additional content or actions without navigating away.",
     "anatomy": {
       "parts": [
-        { "label": "Arrow / Caret", "description": "A triangular pointer connecting the popover to its trigger element." },
+        { "label": "Arrow · Caret", "description": "A triangular pointer connecting the popover to its trigger element." },
         { "label": "Content Area", "description": "The body of the popover containing text, controls, or a list." },
         { "label": "Container", "description": "The popover background with border, shadow, and rounded corners." }
       ]
@@ -633,11 +633,11 @@
       "gestures": []
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UIPopoverPresentationController", "visualNotes": "Rounded rectangle with arrow pointing to source; white background with shadow.", "behaviorNotes": "On iPad, appears as floating popover. On iPhone, falls back to sheet presentation." },
-      { "platform": "macos", "name": "NSPopover", "visualNotes": "Rounded popover with arrow; semi-transient or transient behavior.", "behaviorNotes": "Can be transient (dismiss on click outside) or semi-transient (persistent until explicit close)." },
-      { "platform": "android", "name": "PopupWindow / Menu", "visualNotes": "Elevated card without arrow; positioned near the trigger element.", "behaviorNotes": "No arrow indicator by default. Dismiss on outside touch or back button." },
-      { "platform": "windows", "name": "Flyout (WinUI)", "visualNotes": "Light dismiss overlay attached to a control; supports various content.", "behaviorNotes": "Light dismiss behavior — closes on outside click, Escape, or scroll." },
-      { "platform": "web", "name": "Popover API / custom popover", "visualNotes": "Custom positioned element with optional arrow; uses Popper.js or Floating UI.", "behaviorNotes": "HTML Popover API (popover attribute) or custom JS positioning. Focus management important." }
+      { "platform": "ios", "name": "UIPopoverPresentationController", "visualNotes": "Rounded rectangle with arrow pointing to source; white background with shadow.", "behaviorNotes": "On iPad, appears as floating popover. On iPhone, falls back to sheet presentation.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/popovers" },
+      { "platform": "macos", "name": "NSPopover", "visualNotes": "Rounded popover with arrow; semi-transient or transient behavior.", "behaviorNotes": "Can be transient (dismiss on click outside) or semi-transient (persistent until explicit close).", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/popovers" },
+      { "platform": "android", "name": "PopupWindow · Menu", "visualNotes": "Elevated card without arrow; positioned near the trigger element.", "behaviorNotes": "No arrow indicator by default. Dismiss on outside touch or back button.", "referenceUrl": "https://m3.material.io/components/menus/overview" },
+      { "platform": "windows", "name": "Flyout (WinUI)", "visualNotes": "Light dismiss overlay attached to a control; supports various content.", "behaviorNotes": "Light dismiss behavior — closes on outside click, Escape, or scroll.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/dialogs-and-flyouts/flyouts" },
+      { "platform": "web", "name": "Popover API · custom popover", "visualNotes": "Custom positioned element with optional arrow; uses Popper.js or Floating UI.", "behaviorNotes": "HTML Popover API (popover attribute) or custom JS positioning. Focus management important.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/API/Popover_API" }
     ]
   },
   {
@@ -668,23 +668,23 @@
       "gestures": ["Hover to show (desktop)", "Long-press to show (mobile)"]
     },
     "platformVariations": [
-      { "platform": "macos", "name": "NSToolTipManager", "visualNotes": "Yellow-tinted small rectangle near the cursor; system font.", "behaviorNotes": "Appears after ~1 second hover delay. System-managed positioning." },
-      { "platform": "android", "name": "TooltipCompat / PlainTooltip (Material 3)", "visualNotes": "Small dark container with white text; no arrow by default.", "behaviorNotes": "Appears on long press. Rich tooltip variant supports title and action." },
-      { "platform": "windows", "name": "ToolTip (WinUI)", "visualNotes": "Small acrylic popup near the target element.", "behaviorNotes": "Hover-triggered with delay. Keyboard accessible via focus." },
-      { "platform": "web", "name": "title attribute / custom tooltip", "visualNotes": "Browser-native title tooltip or custom CSS/JS tooltip with positioning.", "behaviorNotes": "Native title attribute has no styling control. Custom tooltips need ARIA tooltip role." }
+      { "platform": "macos", "name": "NSToolTipManager", "visualNotes": "Yellow-tinted small rectangle near the cursor; system font.", "behaviorNotes": "Appears after ~1 second hover delay. System-managed positioning.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/help-buttons" },
+      { "platform": "android", "name": "TooltipCompat · PlainTooltip (Material 3)", "visualNotes": "Small dark container with white text; no arrow by default.", "behaviorNotes": "Appears on long press. Rich tooltip variant supports title and action.", "referenceUrl": "https://m3.material.io/components/tooltips/overview" },
+      { "platform": "windows", "name": "ToolTip (WinUI)", "visualNotes": "Small acrylic popup near the target element.", "behaviorNotes": "Hover-triggered with delay. Keyboard accessible via focus.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/tooltips" },
+      { "platform": "web", "name": "title attribute · custom tooltip", "visualNotes": "Browser-native title tooltip or custom CSS/JS tooltip with positioning.", "behaviorNotes": "Native title attribute has no styling control. Custom tooltips need ARIA tooltip role.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/title" }
     ]
   },
   {
     "slug": "action-sheet",
-    "name": "Action Sheet / Bottom Sheet",
+    "name": "Action Sheet · Bottom Sheet",
     "alternativeNames": ["UIAlertController (.actionSheet)", "BottomSheet", "BottomSheetDialog", "Share Sheet"],
     "platforms": ["ios", "android", "web"],
     "category": "overlay",
     "description": "A panel that slides up from the bottom of the screen presenting a set of actions or options related to the current context.",
     "anatomy": {
       "parts": [
-        { "label": "Handle / Drag Indicator", "description": "A small bar at the top used to drag the sheet." },
-        { "label": "Title / Message", "description": "Optional header explaining the context of the actions." },
+        { "label": "Handle · Drag Indicator", "description": "A small bar at the top used to drag the sheet." },
+        { "label": "Title · Message", "description": "Optional header explaining the context of the actions." },
         { "label": "Action List", "description": "Vertical list of action buttons, with destructive actions highlighted." },
         { "label": "Cancel Button", "description": "Separate button at the bottom for dismissing without action (iOS)." },
         { "label": "Scrim", "description": "Dimmed background overlay." }
@@ -704,9 +704,9 @@
       "gestures": ["Swipe down to dismiss", "Drag to half-height detent (iOS)"]
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UIAlertController (.actionSheet)", "visualNotes": "Rounded list of actions with Cancel separated at bottom; iPad shows as popover.", "behaviorNotes": "Destructive actions shown in red. Cancel button is visually separated." },
-      { "platform": "android", "name": "BottomSheetDialog (Material 3)", "visualNotes": "Bottom sheet with drag handle; supports list and grid layouts.", "behaviorNotes": "Supports half-expanded and fully-expanded states. Dismissible by swipe or scrim tap." },
-      { "platform": "web", "name": "Bottom Sheet / Action Sheet", "visualNotes": "Fixed-bottom overlay with action list; common in mobile web apps.", "behaviorNotes": "Implemented with CSS transforms and JavaScript touch handlers. Focus trap needed." }
+      { "platform": "ios", "name": "UIAlertController (.actionSheet)", "visualNotes": "Rounded list of actions with Cancel separated at bottom; iPad shows as popover.", "behaviorNotes": "Destructive actions shown in red. Cancel button is visually separated.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/action-sheets" },
+      { "platform": "android", "name": "BottomSheetDialog (Material 3)", "visualNotes": "Bottom sheet with drag handle; supports list and grid layouts.", "behaviorNotes": "Supports half-expanded and fully-expanded states. Dismissible by swipe or scrim tap.", "referenceUrl": "https://m3.material.io/components/bottom-sheets/overview" },
+      { "platform": "web", "name": "Bottom Sheet · Action Sheet", "visualNotes": "Fixed-bottom overlay with action list; common in mobile web apps.", "behaviorNotes": "Implemented with CSS transforms and JavaScript touch handlers. Focus trap needed." }
     ]
   },
   {
@@ -736,29 +736,29 @@
       "interaction": "Select a menu item to execute its action.",
       "dismissal": "Click/tap outside, select an item, or press Escape.",
       "blocking": false,
-      "gestures": ["Right-click (desktop)", "Long-press (mobile)", "3D Touch / Haptic Touch (iOS)"]
+      "gestures": ["Right-click (desktop)", "Long-press (mobile)", "3D Touch · Haptic Touch (iOS)"]
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UIMenu / UIContextMenuInteraction", "visualNotes": "Blurred menu with rounded items; optional preview with 3D lift effect.", "behaviorNotes": "Long-press triggers with haptic feedback. Supports nested submenus and inline sections." },
-      { "platform": "macos", "name": "NSMenu (contextual)", "visualNotes": "Standard system menu at cursor position; supports icons and shortcuts.", "behaviorNotes": "Right-click or Control-click triggers. Supports submenus and disabled items." },
-      { "platform": "android", "name": "PopupMenu / ContextMenu", "visualNotes": "Elevated card with text items near the touch point.", "behaviorNotes": "Long-press triggers. Supports icons, grouping, and nested submenus." },
-      { "platform": "windows", "name": "MenuFlyout (WinUI)", "visualNotes": "Acrylic flyout menu with icons and keyboard shortcuts.", "behaviorNotes": "Right-click triggers. Supports radio items, toggle items, and submenus." },
-      { "platform": "web", "name": "contextmenu event / custom menu", "visualNotes": "Custom-styled floating menu replacing browser default context menu.", "behaviorNotes": "Prevent default contextmenu event and render custom menu. Needs keyboard navigation support." }
+      { "platform": "ios", "name": "UIMenu · UIContextMenuInteraction", "visualNotes": "Blurred menu with rounded items; optional preview with 3D lift effect.", "behaviorNotes": "Long-press triggers with haptic feedback. Supports nested submenus and inline sections.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/context-menus" },
+      { "platform": "macos", "name": "NSMenu (contextual)", "visualNotes": "Standard system menu at cursor position; supports icons and shortcuts.", "behaviorNotes": "Right-click or Control-click triggers. Supports submenus and disabled items.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/menus" },
+      { "platform": "android", "name": "PopupMenu · ContextMenu", "visualNotes": "Elevated card with text items near the touch point.", "behaviorNotes": "Long-press triggers. Supports icons, grouping, and nested submenus.", "referenceUrl": "https://m3.material.io/components/menus/overview" },
+      { "platform": "windows", "name": "MenuFlyout (WinUI)", "visualNotes": "Acrylic flyout menu with icons and keyboard shortcuts.", "behaviorNotes": "Right-click triggers. Supports radio items, toggle items, and submenus.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/menus" },
+      { "platform": "web", "name": "contextmenu event · custom menu", "visualNotes": "Custom-styled floating menu replacing browser default context menu.", "behaviorNotes": "Prevent default contextmenu event and render custom menu. Needs keyboard navigation support.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/menu/" }
     ]
   },
   {
     "slug": "list",
-    "name": "List / Table View",
+    "name": "List · Table View",
     "alternativeNames": ["UITableView", "UICollectionView (list)", "RecyclerView", "ListView", "Data List"],
     "platforms": ["ios", "macos", "android", "windows", "web"],
     "category": "layout",
     "description": "A vertically scrolling container that displays items in rows, supporting sections, headers, and various cell layouts.",
     "anatomy": {
       "parts": [
-        { "label": "Row / Cell", "description": "Individual item container with content layout." },
+        { "label": "Row · Cell", "description": "Individual item container with content layout." },
         { "label": "Section Header", "description": "Optional sticky header grouping related rows." },
         { "label": "Leading Content", "description": "Left-aligned icon, avatar, or thumbnail in a row." },
-        { "label": "Primary / Secondary Text", "description": "Main label and supporting detail text." },
+        { "label": "Primary · Secondary Text", "description": "Main label and supporting detail text." },
         { "label": "Trailing Accessory", "description": "Right-aligned element: disclosure indicator, switch, badge, etc." },
         { "label": "Divider", "description": "Horizontal line separating rows." }
       ]
@@ -777,11 +777,11 @@
       "gestures": ["Scroll vertically", "Pull to refresh", "Swipe for actions (iOS, Android)", "Long-press for reorder"]
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UITableView / UICollectionView (list)", "visualNotes": "Grouped or plain style; inset rounded sections. Swipe actions with colored backgrounds.", "behaviorNotes": "Swipe-to-delete, swipe actions, pull-to-refresh, edit mode with drag-to-reorder." },
-      { "platform": "macos", "name": "NSTableView / NSOutlineView", "visualNotes": "Column-based table or outline view with source list style.", "behaviorNotes": "Supports column sorting, resize, and reorder. Outline view supports expand/collapse." },
-      { "platform": "android", "name": "RecyclerView + LazyColumn", "visualNotes": "Flat or sectioned list with Material card items or simple text rows.", "behaviorNotes": "Efficient recycling of views. Supports ItemTouchHelper for swipe and drag." },
-      { "platform": "windows", "name": "ListView (WinUI)", "visualNotes": "Single-column list with selection states; supports grouped headers.", "behaviorNotes": "Supports single, multiple, and extended selection. Incremental loading." },
-      { "platform": "web", "name": "ul/ol lists / virtual scrolling", "visualNotes": "Styled list elements or custom div-based rows with CSS grid/flex.", "behaviorNotes": "Virtual scrolling for large lists (react-window, etc.). ARIA list/listitem roles." }
+      { "platform": "ios", "name": "UITableView · UICollectionView (list)", "visualNotes": "Grouped or plain style; inset rounded sections. Swipe actions with colored backgrounds.", "behaviorNotes": "Swipe-to-delete, swipe actions, pull-to-refresh, edit mode with drag-to-reorder.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/lists-and-tables" },
+      { "platform": "macos", "name": "NSTableView · NSOutlineView", "visualNotes": "Column-based table or outline view with source list style.", "behaviorNotes": "Supports column sorting, resize, and reorder. Outline view supports expand/collapse.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/lists-and-tables" },
+      { "platform": "android", "name": "RecyclerView + LazyColumn", "visualNotes": "Flat or sectioned list with Material card items or simple text rows.", "behaviorNotes": "Efficient recycling of views. Supports ItemTouchHelper for swipe and drag.", "referenceUrl": "https://m3.material.io/components/lists/overview" },
+      { "platform": "windows", "name": "ListView (WinUI)", "visualNotes": "Single-column list with selection states; supports grouped headers.", "behaviorNotes": "Supports single, multiple, and extended selection. Incremental loading.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/listview-and-gridview" },
+      { "platform": "web", "name": "ul/ol lists · virtual scrolling", "visualNotes": "Styled list elements or custom div-based rows with CSS grid/flex.", "behaviorNotes": "Virtual scrolling for large lists (react-window, etc.). ARIA list/listitem roles.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ul" }
     ]
   },
   {
@@ -794,7 +794,7 @@
     "anatomy": {
       "parts": [
         { "label": "Container", "description": "Rounded rectangle with background, shadow, and border." },
-        { "label": "Media / Image", "description": "Optional top image or graphic area." },
+        { "label": "Media · Image", "description": "Optional top image or graphic area." },
         { "label": "Header", "description": "Title and subtitle text, often with an avatar or icon." },
         { "label": "Body Content", "description": "Supporting text or content in the middle area." },
         { "label": "Action Area", "description": "Buttons, icons, or links at the bottom of the card." }
@@ -814,14 +814,14 @@
       "gestures": ["Tap to navigate", "Swipe to dismiss (in some implementations)"]
     },
     "platformVariations": [
-      { "platform": "android", "name": "Card (Material 3)", "visualNotes": "Three variants: elevated (shadow), filled (flat), and outlined (border).", "behaviorNotes": "Can be clickable with ripple effect. Supports expandable cards." },
-      { "platform": "windows", "name": "Card / Expander", "visualNotes": "Rounded container with subtle background; often part of settings pages.", "behaviorNotes": "May support expand/collapse pattern for grouped settings." },
-      { "platform": "web", "name": "Card (CSS)", "visualNotes": "Container with border-radius, box-shadow, and padding; universal pattern.", "behaviorNotes": "Implement as <article> or <div> with proper heading hierarchy for accessibility." }
+      { "platform": "android", "name": "Card (Material 3)", "visualNotes": "Three variants: elevated (shadow), filled (flat), and outlined (border).", "behaviorNotes": "Can be clickable with ripple effect. Supports expandable cards.", "referenceUrl": "https://m3.material.io/components/cards/overview" },
+      { "platform": "windows", "name": "Card · Expander", "visualNotes": "Rounded container with subtle background; often part of settings pages.", "behaviorNotes": "May support expand/collapse pattern for grouped settings." },
+      { "platform": "web", "name": "Card (CSS)", "visualNotes": "Container with border-radius, box-shadow, and padding; universal pattern.", "behaviorNotes": "Implement as <article> or <div> with proper heading hierarchy for accessibility.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/article" }
     ]
   },
   {
     "slug": "divider",
-    "name": "Divider / Separator",
+    "name": "Divider · Separator",
     "alternativeNames": ["Separator", "Horizontal Rule", "Divider Line", "HR"],
     "platforms": ["ios", "macos", "android", "windows", "web"],
     "category": "layout",
@@ -846,11 +846,11 @@
       "gestures": []
     },
     "platformVariations": [
-      { "platform": "ios", "name": "Separator (SwiftUI) / cell separator", "visualNotes": "Hairline gray line; may be inset to align with text in list cells.", "behaviorNotes": "Automatically managed by UITableView; can be hidden per-cell." },
+      { "platform": "ios", "name": "Separator (SwiftUI) · cell separator", "visualNotes": "Hairline gray line; may be inset to align with text in list cells.", "behaviorNotes": "Automatically managed by UITableView; can be hidden per-cell." },
       { "platform": "macos", "name": "NSBox (separator)", "visualNotes": "Thin horizontal or vertical line; system gray color.", "behaviorNotes": "Used in toolbars, sidebars, and split views." },
-      { "platform": "android", "name": "Divider (Material 3)", "visualNotes": "1dp line; full-bleed or inset variant with start padding.", "behaviorNotes": "Can be horizontal or vertical. Supports full-width and middle-inset." },
-      { "platform": "windows", "name": "MenuFlyoutSeparator / custom divider", "visualNotes": "Thin line in menus and lists; system styling.", "behaviorNotes": "Used in navigation views, command bars, and list separators." },
-      { "platform": "web", "name": "hr element / border", "visualNotes": "Native hr element or CSS border on adjacent elements.", "behaviorNotes": "Use role='separator' for non-hr dividers. aria-orientation for vertical dividers." }
+      { "platform": "android", "name": "Divider (Material 3)", "visualNotes": "1dp line; full-bleed or inset variant with start padding.", "behaviorNotes": "Can be horizontal or vertical. Supports full-width and middle-inset.", "referenceUrl": "https://m3.material.io/components/divider/overview" },
+      { "platform": "windows", "name": "MenuFlyoutSeparator · custom divider", "visualNotes": "Thin line in menus and lists; system styling.", "behaviorNotes": "Used in navigation views, command bars, and list separators." },
+      { "platform": "web", "name": "hr element · border", "visualNotes": "Native hr element or CSS border on adjacent elements.", "behaviorNotes": "Use role='separator' for non-hr dividers. aria-orientation for vertical dividers.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/hr" }
     ]
   },
   {
@@ -865,7 +865,7 @@
         { "label": "Container", "description": "Circular or pill-shaped elevated surface." },
         { "label": "Icon", "description": "Centered icon representing the primary action (e.g., + for create)." },
         { "label": "Label", "description": "Optional text label next to the icon (extended FAB)." },
-        { "label": "Shadow / Elevation", "description": "Drop shadow indicating the floating elevation." }
+        { "label": "Shadow · Elevation", "description": "Drop shadow indicating the floating elevation." }
       ]
     },
     "placement": {
@@ -882,7 +882,7 @@
       "gestures": ["Tap to activate", "Scroll to hide/show (optional animation)"]
     },
     "platformVariations": [
-      { "platform": "android", "name": "FloatingActionButton (Material 3)", "visualNotes": "Three sizes: small, regular, large. Supports surface, primary, secondary, and tertiary colors.", "behaviorNotes": "Animates on scroll (hide/show). Extended FAB collapses to icon-only on scroll." },
+      { "platform": "android", "name": "FloatingActionButton (Material 3)", "visualNotes": "Three sizes: small, regular, large. Supports surface, primary, secondary, and tertiary colors.", "behaviorNotes": "Animates on scroll (hide/show). Extended FAB collapses to icon-only on scroll.", "referenceUrl": "https://m3.material.io/components/floating-action-button/overview" },
       { "platform": "web", "name": "FAB (CSS/JS)", "visualNotes": "Fixed-position circular button; often Material Design-inspired.", "behaviorNotes": "Position: fixed at bottom-right. Should not obscure important content. Ensure focus management." }
     ]
   },
@@ -914,11 +914,511 @@
       "gestures": ["Tap to select segment", "Swipe between segments (some implementations)"]
     },
     "platformVariations": [
-      { "platform": "ios", "name": "UISegmentedControl", "visualNotes": "Rounded bar with sliding white pill indicator over gray background.", "behaviorNotes": "Supports 2–5 segments. Spring animation when switching. Integrates in navigation bars." },
-      { "platform": "macos", "name": "NSSegmentedControl", "visualNotes": "Separated or capsule style segments with system appearance.", "behaviorNotes": "Supports select-one or select-any (toggle) tracking modes." },
-      { "platform": "android", "name": "SegmentedButton (Material 3)", "visualNotes": "Outlined button group with filled indicator on selected segment.", "behaviorNotes": "Supports single-select and multi-select modes. Icon or text segments." },
-      { "platform": "windows", "name": "ToggleButton group / Segmented", "visualNotes": "Group of toggle buttons with shared container.", "behaviorNotes": "Keyboard navigable with arrow keys within the group." },
-      { "platform": "web", "name": "Button group / radio group", "visualNotes": "Inline button group with CSS styling; active state highlight.", "behaviorNotes": "Use role='radiogroup' with role='radio' for single-select. aria-pressed for toggles." }
+      { "platform": "ios", "name": "UISegmentedControl", "visualNotes": "Rounded bar with sliding white pill indicator over gray background.", "behaviorNotes": "Supports 2–5 segments. Spring animation when switching. Integrates in navigation bars.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/segmented-controls" },
+      { "platform": "macos", "name": "NSSegmentedControl", "visualNotes": "Separated or capsule style segments with system appearance.", "behaviorNotes": "Supports select-one or select-any (toggle) tracking modes.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/segmented-controls" },
+      { "platform": "android", "name": "SegmentedButton (Material 3)", "visualNotes": "Outlined button group with filled indicator on selected segment.", "behaviorNotes": "Supports single-select and multi-select modes. Icon or text segments.", "referenceUrl": "https://m3.material.io/components/segmented-button/overview" },
+      { "platform": "windows", "name": "ToggleButton group · Segmented", "visualNotes": "Group of toggle buttons with shared container.", "behaviorNotes": "Keyboard navigable with arrow keys within the group." },
+      { "platform": "web", "name": "Button group · radio group", "visualNotes": "Inline button group with CSS styling; active state highlight.", "behaviorNotes": "Use role='radiogroup' with role='radio' for single-select. aria-pressed for toggles.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/radio/" }
+    ]
+  },
+  {
+    "slug": "date-picker",
+    "name": "Date Picker",
+    "alternativeNames": ["UIDatePicker", "DatePicker", "CalendarDatePicker", "Calendar View", "Date Selector"],
+    "platforms": ["ios", "macos", "android", "windows", "web"],
+    "category": "input",
+    "description": "A control that lets users select a date (day, month, year) from a calendar or spinner interface.",
+    "anatomy": {
+      "parts": [
+        { "label": "Date Display / Trigger", "description": "A button or field showing the currently selected date that opens the picker." },
+        { "label": "Calendar Grid", "description": "A month view grid showing days; users tap to select a date." },
+        { "label": "Month/Year Navigation", "description": "Controls (arrows or dropdowns) to move between months and years." },
+        { "label": "Today Indicator", "description": "Visual highlight on the current date in the calendar grid." },
+        { "label": "Selection Indicator", "description": "Visual highlight on the selected date or date range." }
+      ]
+    },
+    "placement": {
+      "position": "Inline in forms or as a popover/modal attached to a trigger",
+      "fixed": false,
+      "overlay": true,
+      "context": "Used in forms, booking flows, scheduling, and any date-entry scenario."
+    },
+    "behavior": {
+      "appears": "On tap/click of a date field or trigger button.",
+      "interaction": "Navigate months, tap a date to select, confirm or auto-dismiss.",
+      "dismissal": "Selecting a date, tapping outside, or pressing Cancel/Escape.",
+      "blocking": false,
+      "gestures": ["Swipe to change month (mobile)", "Scroll wheel for spinner mode"]
+    },
+    "platformVariations": [
+      { "platform": "ios", "name": "UIDatePicker", "visualNotes": "Compact inline style, wheels style, or graphical calendar grid. Tinted accent color.", "behaviorNotes": "Compact mode shows a popover calendar on tap. Wheel mode uses spinning columns. Supports minimum/maximum date constraints.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/date-pickers" },
+      { "platform": "macos", "name": "NSDatePicker", "visualNotes": "Textual stepper, clock face, or calendar grid style.", "behaviorNotes": "Textual style allows direct keyboard entry of date components. Supports date range selection.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/date-pickers" },
+      { "platform": "android", "name": "DatePicker (Material 3)", "visualNotes": "Modal or docked calendar with header showing selected date. Supports input mode for typing.", "behaviorNotes": "Modal date picker appears as a dialog. Docked variant is inline. Range selection with two dates supported.", "referenceUrl": "https://m3.material.io/components/date-pickers/overview" },
+      { "platform": "windows", "name": "CalendarDatePicker / DatePicker (WinUI)", "visualNotes": "CalendarDatePicker shows a text field with dropdown calendar. DatePicker uses spinning selectors.", "behaviorNotes": "CalendarDatePicker supports blackout dates. DatePicker uses day/month/year spinners.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/calendar-date-picker" },
+      { "platform": "web", "name": "input[type=date] / custom date picker", "visualNotes": "Native date input shows browser-specific picker. Custom pickers use calendar grids.", "behaviorNotes": "Native input supports min, max, step attributes. Custom pickers need ARIA grid role for calendar accessibility.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date" }
+    ]
+  },
+  {
+    "slug": "time-picker",
+    "name": "Time Picker",
+    "alternativeNames": ["UIDatePicker (time)", "TimePicker", "Clock Picker", "Time Selector"],
+    "platforms": ["ios", "android", "windows", "web"],
+    "category": "input",
+    "description": "A control that lets users select a specific time (hours and minutes, optionally seconds and AM/PM).",
+    "anatomy": {
+      "parts": [
+        { "label": "Time Display / Trigger", "description": "Field or button showing the currently selected time." },
+        { "label": "Hour Selector", "description": "Spinner, wheel, or clock face for selecting the hour." },
+        { "label": "Minute Selector", "description": "Spinner, wheel, or clock face for selecting the minute." },
+        { "label": "AM/PM Toggle", "description": "Segmented control or button for 12-hour format selection." },
+        { "label": "Clock Face", "description": "Circular dial for selecting time by dragging or tapping (Android)." }
+      ]
+    },
+    "placement": {
+      "position": "Inline in forms or as a popover/modal attached to a trigger",
+      "fixed": false,
+      "overlay": true,
+      "context": "Used in scheduling, alarms, reminders, and time-entry fields."
+    },
+    "behavior": {
+      "appears": "On tap/click of a time field or trigger button.",
+      "interaction": "Select hours and minutes via spinner, clock dial, or direct input.",
+      "dismissal": "Confirming selection or pressing Cancel/Escape.",
+      "blocking": false,
+      "gestures": ["Drag on clock face (Android)", "Scroll wheel columns (iOS)"]
+    },
+    "platformVariations": [
+      { "platform": "ios", "name": "UIDatePicker (time mode)", "visualNotes": "Spinning wheels for hour, minute, and AM/PM. Compact inline or wheel style.", "behaviorNotes": "Wheel columns snap to values. Supports minute intervals (e.g., every 5 minutes).", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/date-pickers" },
+      { "platform": "android", "name": "TimePicker (Material 3)", "visualNotes": "Clock dial face or keyboard input mode. Hour ring and minute ring.", "behaviorNotes": "Dial mode: tap to select hour then minute. Input mode: direct keyboard entry. Supports 12h and 24h formats.", "referenceUrl": "https://m3.material.io/components/time-pickers/overview" },
+      { "platform": "windows", "name": "TimePicker (WinUI)", "visualNotes": "Looping spinners for hour, minute, and period in a flyout.", "behaviorNotes": "Opens a flyout with scrollable columns. Supports 12-hour and 24-hour clock formats.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/time-picker" },
+      { "platform": "web", "name": "input[type=time] / custom time picker", "visualNotes": "Native input shows browser-specific time spinner. Custom pickers use clock dials or dropdowns.", "behaviorNotes": "Native input supports min, max, step attributes. Custom implementations need ARIA spinbutton roles.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/time" }
+    ]
+  },
+  {
+    "slug": "search-bar",
+    "name": "Search Bar",
+    "alternativeNames": ["UISearchBar", "UISearchController", "Search", "AutoSuggestBox", "Search Field"],
+    "platforms": ["ios", "macos", "android", "windows", "web"],
+    "category": "input",
+    "description": "A text input field optimized for searching, typically with a magnifying glass icon, clear button, and optional suggestions dropdown.",
+    "anatomy": {
+      "parts": [
+        { "label": "Search Icon", "description": "Magnifying glass icon indicating the search function." },
+        { "label": "Text Input", "description": "The editable field where users type their search query." },
+        { "label": "Clear Button", "description": "Button (×) that appears when text is entered to clear the field." },
+        { "label": "Suggestions List", "description": "Dropdown list of search suggestions or recent searches." },
+        { "label": "Cancel / Back Button", "description": "Optional button to dismiss search mode and return to previous view." }
+      ]
+    },
+    "placement": {
+      "position": "Top of content area, within navigation bars, or as an expandable overlay",
+      "fixed": false,
+      "overlay": false,
+      "context": "Used in apps with searchable content — contacts, messages, settings, catalogs."
+    },
+    "behavior": {
+      "appears": "Always visible or revealed on scroll/tap of a search icon.",
+      "interaction": "Tap to focus, type to search, suggestions update as you type.",
+      "dismissal": "Tap Cancel, press Escape, or select a result.",
+      "blocking": false,
+      "gestures": ["Pull down to reveal (iOS)", "Type-ahead for suggestions"]
+    },
+    "platformVariations": [
+      { "platform": "ios", "name": "UISearchBar / UISearchController", "visualNotes": "Rounded rectangle with gray background, magnifying glass, and clear button. Appears below navigation bar.", "behaviorNotes": "Integrates with UINavigationItem. Supports scope buttons, tokens, and suggested searches. Pull-down to reveal.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/search-fields" },
+      { "platform": "macos", "name": "NSSearchField", "visualNotes": "Rounded text field with magnifying glass icon and clear button.", "behaviorNotes": "Supports recent searches menu and search category tokens. Keyboard shortcut Cmd+F.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/search-fields" },
+      { "platform": "android", "name": "Search (Material 3)", "visualNotes": "Search bar or search view with animated expansion. Rounded container with leading icon.", "behaviorNotes": "Search bar expands to search view with suggestions. Supports voice search and barcode scanning.", "referenceUrl": "https://m3.material.io/components/search/overview" },
+      { "platform": "windows", "name": "AutoSuggestBox (WinUI)", "visualNotes": "Text box with search icon and dropdown suggestion list.", "behaviorNotes": "Provides real-time suggestions as the user types. Supports custom suggestion templates.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/auto-suggest-box" },
+      { "platform": "web", "name": "input[type=search] / search landmark", "visualNotes": "Text input with search semantics. Often styled with icon and clear button via CSS.", "behaviorNotes": "Use role='search' landmark for the form. Supports datalist for suggestions. Escape clears the field in some browsers.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/search" }
+    ]
+  },
+  {
+    "slug": "radio-button",
+    "name": "Radio Button",
+    "alternativeNames": ["Radio", "RadioButton", "Option Button", "Single Select"],
+    "platforms": ["macos", "android", "windows", "web"],
+    "category": "input",
+    "description": "A circular control that lets users select exactly one option from a mutually exclusive group.",
+    "anatomy": {
+      "parts": [
+        { "label": "Circle", "description": "The round container indicating the radio state (filled dot when selected, empty when not)." },
+        { "label": "Fill Dot", "description": "The inner circle indicator showing the selected state." },
+        { "label": "Label", "description": "Adjacent text describing the option." },
+        { "label": "Group Container", "description": "The logical grouping of related radio buttons." }
+      ]
+    },
+    "placement": {
+      "position": "Inline within forms, settings, and option groups",
+      "fixed": false,
+      "overlay": false,
+      "context": "Used when users must choose exactly one option from a small visible set (2–7 options)."
+    },
+    "behavior": {
+      "appears": "Always visible where an exclusive choice exists.",
+      "interaction": "Click/tap a radio button or its label to select; deselects the previously selected option.",
+      "dismissal": "Not dismissible; persists in the form.",
+      "blocking": false,
+      "gestures": ["Tap to select (mobile)", "Click or arrow keys to navigate (desktop)"]
+    },
+    "platformVariations": [
+      { "platform": "macos", "name": "NSButton (radio style)", "visualNotes": "Standard circular radio button with system styling; blue fill when selected.", "behaviorNotes": "Arrow keys navigate within a group. Space selects. Tab moves to next group.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/radio-buttons" },
+      { "platform": "android", "name": "RadioButton (Material 3)", "visualNotes": "Circle with animated fill dot; supports error state styling.", "behaviorNotes": "Ripple effect on selection. Use RadioGroup to ensure mutual exclusivity.", "referenceUrl": "https://m3.material.io/components/radio-button/overview" },
+      { "platform": "windows", "name": "RadioButton (WinUI)", "visualNotes": "Circle with inner dot; Fluent Design animation on state change.", "behaviorNotes": "Supports grouping via GroupName property. Keyboard navigable with arrow keys.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/radio-button" },
+      { "platform": "web", "name": "input[type=radio]", "visualNotes": "Browser-default circle or custom-styled. Grouped by sharing the same name attribute.", "behaviorNotes": "Arrow keys navigate within group. Use fieldset and legend for accessible grouping.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio" }
+    ]
+  },
+  {
+    "slug": "chips",
+    "name": "Chips / Tags",
+    "alternativeNames": ["Chip", "Tag", "Token", "TokenField", "Filter Chip", "Input Chip"],
+    "platforms": ["ios", "android", "web"],
+    "category": "input",
+    "description": "Compact elements representing an attribute, action, or filter choice, often shown as rounded pill-shaped items.",
+    "anatomy": {
+      "parts": [
+        { "label": "Container", "description": "Pill-shaped or rounded rectangle background." },
+        { "label": "Label", "description": "Text content of the chip." },
+        { "label": "Leading Icon / Avatar", "description": "Optional icon or small image at the start of the chip." },
+        { "label": "Remove Button", "description": "Optional trailing × icon to dismiss the chip." },
+        { "label": "Checkmark", "description": "Optional leading checkmark for selected filter chips." }
+      ]
+    },
+    "placement": {
+      "position": "Inline within forms, filter bars, search fields, and content areas",
+      "fixed": false,
+      "overlay": false,
+      "context": "Used for multi-select filters, tag inputs, email recipients, and compact action sets."
+    },
+    "behavior": {
+      "appears": "Always visible or created dynamically as users enter values.",
+      "interaction": "Tap to select/deselect (filter chips) or tap × to remove (input chips).",
+      "dismissal": "Remove button on individual chips or backspace in input contexts.",
+      "blocking": false,
+      "gestures": ["Tap to toggle (filter)", "Swipe to scroll chip row horizontally"]
+    },
+    "platformVariations": [
+      { "platform": "ios", "name": "UISearchToken / custom chips", "visualNotes": "Tokens in UISearchController appear as pill shapes in the search field. Custom chips vary.", "behaviorNotes": "Search tokens represent scoped filters. Removable via backspace. No native standalone chip component.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/search-fields" },
+      { "platform": "android", "name": "Chips (Material 3)", "visualNotes": "Four variants: assist, filter, input, suggestion. Pill-shaped with optional icon and close button.", "behaviorNotes": "Filter chips toggle selection. Input chips represent user input and are removable. Horizontally scrollable chip groups.", "referenceUrl": "https://m3.material.io/components/chips/overview" },
+      { "platform": "web", "name": "Chip / Tag (custom)", "visualNotes": "Custom-styled pill elements. Common in design systems (Bootstrap badges, MUI chips).", "behaviorNotes": "Use role='option' in a listbox for selectable chips, or role='group' for chip sets. Removable chips need accessible dismiss buttons.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/listbox/" }
+    ]
+  },
+  {
+    "slug": "tabs",
+    "name": "Tabs (Content)",
+    "alternativeNames": ["Tab Panel", "TabView", "Tab Strip", "NSTabView", "Horizontal Tabs"],
+    "platforms": ["ios", "macos", "android", "windows", "web"],
+    "category": "navigation",
+    "description": "A horizontal row of labeled tabs that switch between different content panels within the same page context, distinct from bottom navigation tab bars.",
+    "anatomy": {
+      "parts": [
+        { "label": "Tab Item", "description": "Individual tab button with text label and optional icon." },
+        { "label": "Active Indicator", "description": "Underline, pill, or background highlight on the selected tab." },
+        { "label": "Tab Container", "description": "The horizontal strip containing all tab items." },
+        { "label": "Content Panel", "description": "The visible content area associated with the active tab." },
+        { "label": "Scroll Indicator", "description": "Arrow or fade indicating more tabs are available beyond the visible area." }
+      ]
+    },
+    "placement": {
+      "position": "Top of a content section, below the navigation bar or page header",
+      "fixed": false,
+      "overlay": false,
+      "context": "Used to organize related content into switchable views within a single screen."
+    },
+    "behavior": {
+      "appears": "Always visible when multiple content panels exist.",
+      "interaction": "Tap a tab to switch to its content panel. May support swipe to switch.",
+      "dismissal": "Not dismissible; persistent navigation within the section.",
+      "blocking": false,
+      "gestures": ["Swipe between panels (Android, iOS)", "Scroll to reveal more tabs"]
+    },
+    "platformVariations": [
+      { "platform": "ios", "name": "Segmented tab pattern / custom tabs", "visualNotes": "iOS uses segmented controls or custom tab bars at the top of content areas. No distinct native tab component.", "behaviorNotes": "Often built with UISegmentedControl or custom views. Swipe gestures to switch between panels.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/tab-views" },
+      { "platform": "macos", "name": "NSTabView", "visualNotes": "Top or bottom tabs with system styling. Segmented control variant for compact tabs.", "behaviorNotes": "Supports tabless mode for programmatic switching. Click to switch panels.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/tab-views" },
+      { "platform": "android", "name": "Tabs (Material 3)", "visualNotes": "Primary tabs (underline indicator) or secondary tabs (subtle indicator). Fixed or scrollable.", "behaviorNotes": "Swipe between panels with ViewPager. Tab indicator animates between tabs. Scrollable for many tabs.", "referenceUrl": "https://m3.material.io/components/tabs/overview" },
+      { "platform": "windows", "name": "TabView (WinUI)", "visualNotes": "Browser-style tabs with close buttons. Supports add (+) button for new tabs.", "behaviorNotes": "Drag to reorder tabs. Supports closable tabs and overflow menu. Keyboard navigable.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/tab-view" },
+      { "platform": "web", "name": "Tabs (ARIA tablist)", "visualNotes": "Horizontal tab strip with underline or background indicator. Styled with CSS.", "behaviorNotes": "Use role='tablist', role='tab', role='tabpanel'. Arrow keys navigate between tabs. Only active panel is in DOM/visible.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/tabs/" }
+    ]
+  },
+  {
+    "slug": "carousel",
+    "name": "Carousel / Page Control",
+    "alternativeNames": ["Page Control", "UIPageControl", "ViewPager", "FlipView", "Slideshow", "Image Rotator"],
+    "platforms": ["ios", "android", "windows", "web"],
+    "category": "layout",
+    "description": "A component that displays a horizontal sequence of content items (images, cards, pages) one at a time, navigable by swiping or controls.",
+    "anatomy": {
+      "parts": [
+        { "label": "Slide / Page", "description": "Individual content item displayed in the carousel." },
+        { "label": "Page Indicators", "description": "Dots or pips showing the total number of pages and current position." },
+        { "label": "Navigation Arrows", "description": "Optional previous/next buttons on the sides." },
+        { "label": "Content Container", "description": "The viewport that clips and displays the current slide." }
+      ]
+    },
+    "placement": {
+      "position": "Inline within content areas, hero sections, or onboarding flows",
+      "fixed": false,
+      "overlay": false,
+      "context": "Used for image galleries, onboarding, product showcases, and featured content."
+    },
+    "behavior": {
+      "appears": "Visible when multiple items need horizontal paging or browsing.",
+      "interaction": "Swipe left/right to change slides; tap indicators or arrows to navigate.",
+      "dismissal": "Not dismissible; persistent content layout.",
+      "blocking": false,
+      "gestures": ["Swipe left/right (mobile)", "Click arrows (desktop)", "Auto-advance optional"]
+    },
+    "platformVariations": [
+      { "platform": "ios", "name": "UIPageViewController / UIPageControl", "visualNotes": "Full-bleed page swiping with dot indicators at the bottom. Smooth page-curl or scroll transition.", "behaviorNotes": "UIPageControl shows current position. Supports custom indicator images. Common in onboarding flows.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/page-controls" },
+      { "platform": "android", "name": "Carousel (Material 3)", "visualNotes": "Horizontal scrolling cards with peek of adjacent items. Supports hero, multi-browse, and full-screen layouts.", "behaviorNotes": "Snaps to items. Supports fling gestures. Indicator dots or page numbers for position.", "referenceUrl": "https://m3.material.io/components/carousel/overview" },
+      { "platform": "windows", "name": "FlipView / PipsPager (WinUI)", "visualNotes": "FlipView shows one item at a time with flip animation. PipsPager adds dot navigation.", "behaviorNotes": "Supports horizontal and vertical orientation. Touch swipe and arrow key navigation.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/flipview" },
+      { "platform": "web", "name": "Carousel (ARIA)", "visualNotes": "Custom horizontal slider with navigation arrows and dot indicators. CSS scroll-snap for smooth snapping.", "behaviorNotes": "Use aria-roledescription='carousel', aria-label for slides. Auto-rotation should have pause control. Keyboard arrow navigation.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/" }
+    ]
+  },
+  {
+    "slug": "accordion",
+    "name": "Accordion / Disclosure",
+    "alternativeNames": ["Expandable Section", "Disclosure", "Expander", "Collapsible", "Details/Summary"],
+    "platforms": ["ios", "macos", "android", "windows", "web"],
+    "category": "layout",
+    "description": "A vertically stacked set of collapsible sections, each with a header that toggles visibility of its content.",
+    "anatomy": {
+      "parts": [
+        { "label": "Header / Trigger", "description": "The clickable area containing a title and expand/collapse indicator." },
+        { "label": "Expand/Collapse Icon", "description": "Chevron, plus/minus, or triangle indicating the section state." },
+        { "label": "Content Panel", "description": "The hidden/visible content area revealed when expanded." },
+        { "label": "Divider", "description": "Optional separator between accordion sections." }
+      ]
+    },
+    "placement": {
+      "position": "Inline within content areas, settings, FAQ pages, and forms",
+      "fixed": false,
+      "overlay": false,
+      "context": "Used to progressively disclose content, reduce visual clutter, and organize long pages."
+    },
+    "behavior": {
+      "appears": "Always visible; sections start collapsed or expanded based on context.",
+      "interaction": "Click/tap the header to toggle expand/collapse. Some allow only one section open at a time.",
+      "dismissal": "Not dismissible; click header to collapse.",
+      "blocking": false,
+      "gestures": ["Tap header to toggle"]
+    },
+    "platformVariations": [
+      { "platform": "ios", "name": "DisclosureGroup (SwiftUI) / custom", "visualNotes": "Disclosure triangles in lists; expandable rows in grouped table views.", "behaviorNotes": "SwiftUI DisclosureGroup provides animated expand/collapse. UIKit uses custom expandable cells.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/disclosure-controls" },
+      { "platform": "macos", "name": "NSDisclosureButtonCell / Outline View", "visualNotes": "Disclosure triangles for hierarchical list expansion. System-styled chevron indicators.", "behaviorNotes": "Click triangle to expand/collapse. Used in sidebars, outlines, and preference panes.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/disclosure-controls" },
+      { "platform": "android", "name": "Expandable list / custom accordion", "visualNotes": "ExpandableListView or custom RecyclerView with animated expand/collapse.", "behaviorNotes": "No official M3 accordion component. Typically built with AnimatedVisibility in Compose or custom views." },
+      { "platform": "windows", "name": "Expander (WinUI)", "visualNotes": "Header bar with chevron; content area slides open with animation.", "behaviorNotes": "Supports expand direction (down or up). Header is always visible; content toggles.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/expander" },
+      { "platform": "web", "name": "details/summary / ARIA disclosure", "visualNotes": "Native HTML details/summary elements or custom accordion with ARIA. Chevron or +/− indicators.", "behaviorNotes": "Native details element has built-in toggle behavior. ARIA pattern uses aria-expanded and aria-controls.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/" }
+    ]
+  },
+  {
+    "slug": "tree-view",
+    "name": "Tree View",
+    "alternativeNames": ["TreeView", "NSOutlineView", "Hierarchical List", "Tree Navigation", "File Tree"],
+    "platforms": ["macos", "windows", "web"],
+    "category": "navigation",
+    "description": "A hierarchical list where items can be expanded or collapsed to reveal or hide nested child items, forming a tree structure.",
+    "anatomy": {
+      "parts": [
+        { "label": "Tree Item / Node", "description": "Individual item in the tree, which may be a leaf or a parent of child nodes." },
+        { "label": "Expand/Collapse Control", "description": "Arrow or triangle icon to toggle visibility of child items." },
+        { "label": "Item Icon", "description": "Optional icon representing the item type (folder, file, etc.)." },
+        { "label": "Item Label", "description": "Text label for the tree item." },
+        { "label": "Indent Guide", "description": "Visual indentation lines or spacing showing the nesting level." }
+      ]
+    },
+    "placement": {
+      "position": "Side panels, file browsers, settings hierarchies, and navigation areas",
+      "fixed": false,
+      "overlay": false,
+      "context": "Used for file systems, organizational charts, nested navigation, and hierarchical data."
+    },
+    "behavior": {
+      "appears": "Visible as the primary navigation or content structure.",
+      "interaction": "Click expand/collapse to toggle children; click item to select; drag to reorder (optional).",
+      "dismissal": "Not dismissible; structural navigation element.",
+      "blocking": false,
+      "gestures": ["Arrow keys to navigate", "Left/Right to collapse/expand", "Double-click to toggle"]
+    },
+    "platformVariations": [
+      { "platform": "macos", "name": "NSOutlineView", "visualNotes": "Disclosure triangles with indented rows. Source list style in sidebars.", "behaviorNotes": "Supports drag-and-drop reordering. Multiple selection. Type-to-select. Integrates with NSTreeController.", "referenceUrl": "https://developer.apple.com/documentation/appkit/nsoutlineview" },
+      { "platform": "windows", "name": "TreeView (WinUI)", "visualNotes": "Indented list with expand/collapse chevrons. Supports icons and checkboxes per item.", "behaviorNotes": "Supports single and multi-selection. Drag-and-drop. Lazy loading of children. Keyboard navigable.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/tree-view" },
+      { "platform": "web", "name": "Tree View (ARIA)", "visualNotes": "Custom styled hierarchical list with indentation and expand/collapse indicators.", "behaviorNotes": "Use role='tree' with role='treeitem'. Arrow keys for navigation. Enter to activate. Home/End for first/last.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/treeview/" }
+    ]
+  },
+  {
+    "slug": "stepper",
+    "name": "Stepper / Spinbutton",
+    "alternativeNames": ["UIStepper", "NSStepper", "NumberBox", "Spinbutton", "Numeric Input"],
+    "platforms": ["ios", "macos", "windows", "web"],
+    "category": "input",
+    "description": "A control with increment (+) and decrement (−) buttons for adjusting a numeric value in fixed steps.",
+    "anatomy": {
+      "parts": [
+        { "label": "Decrement Button", "description": "Button (−) to decrease the value by one step." },
+        { "label": "Increment Button", "description": "Button (+) to increase the value by one step." },
+        { "label": "Value Display", "description": "Text label or input field showing the current numeric value." },
+        { "label": "Container", "description": "The control housing that groups the buttons and display." }
+      ]
+    },
+    "placement": {
+      "position": "Inline within forms, settings, and quantity selectors",
+      "fixed": false,
+      "overlay": false,
+      "context": "Used for quantity selection, numeric settings (font size, zoom level), and bounded numeric input."
+    },
+    "behavior": {
+      "appears": "Always visible where a numeric value needs step-based adjustment.",
+      "interaction": "Tap +/− to change value; long-press to auto-repeat; direct entry in some variants.",
+      "dismissal": "Not dismissible; persists as an input control.",
+      "blocking": false,
+      "gestures": ["Tap to step", "Long-press for auto-repeat", "Arrow keys on keyboard"]
+    },
+    "platformVariations": [
+      { "platform": "ios", "name": "UIStepper", "visualNotes": "Rounded segmented control with − and + buttons. Value label displayed separately.", "behaviorNotes": "Supports auto-repeat on long press. Wraps around or clamps at min/max. Value label is a separate element.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/steppers" },
+      { "platform": "macos", "name": "NSStepper", "visualNotes": "Small up/down arrow buttons, typically paired with an adjacent text field.", "behaviorNotes": "Supports auto-repeat. Configurable min, max, and step increment. Keyboard up/down arrows.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/steppers" },
+      { "platform": "windows", "name": "NumberBox (WinUI)", "visualNotes": "Text field with up/down spin buttons. Supports inline or compact button placement.", "behaviorNotes": "Direct keyboard entry with validation. Up/down buttons for stepping. Supports expressions (e.g., 2+2).", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/number-box" },
+      { "platform": "web", "name": "input[type=number] / ARIA spinbutton", "visualNotes": "Native number input with browser-provided spin buttons. Custom implementations vary.", "behaviorNotes": "Supports min, max, step attributes. Arrow keys increment/decrement. Use role='spinbutton' for custom.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/" }
+    ]
+  },
+  {
+    "slug": "color-picker",
+    "name": "Color Picker",
+    "alternativeNames": ["Color Well", "NSColorWell", "ColorPicker", "Color Selector"],
+    "platforms": ["macos", "windows", "web"],
+    "category": "input",
+    "description": "A control that lets users select a color from a palette, spectrum, or by entering color values.",
+    "anatomy": {
+      "parts": [
+        { "label": "Color Well / Trigger", "description": "A small swatch showing the current color that opens the picker." },
+        { "label": "Color Spectrum / Wheel", "description": "A gradient area or color wheel for visual color selection." },
+        { "label": "Hue / Saturation / Brightness Sliders", "description": "Individual sliders for adjusting color components." },
+        { "label": "Hex / RGB Input", "description": "Text fields for entering precise color values." },
+        { "label": "Preset Palette", "description": "Grid of predefined color swatches for quick selection." }
+      ]
+    },
+    "placement": {
+      "position": "Popover or modal attached to a color well trigger, or inline in settings",
+      "fixed": false,
+      "overlay": true,
+      "context": "Used in design tools, theming settings, annotation tools, and document editors."
+    },
+    "behavior": {
+      "appears": "On click of a color well or color button.",
+      "interaction": "Click on spectrum to pick color; adjust sliders; enter hex values; pick from presets.",
+      "dismissal": "Click outside, press Escape, or confirm selection.",
+      "blocking": false,
+      "gestures": ["Drag on spectrum to pick color", "Eyedropper tool for screen sampling"]
+    },
+    "platformVariations": [
+      { "platform": "macos", "name": "NSColorWell / NSColorPanel", "visualNotes": "Color well swatch that opens the system color panel with wheel, sliders, palettes, spectrum, and crayons.", "behaviorNotes": "System-wide color panel shared across apps. Supports eyedropper. Integrates with color spaces.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/color-wells" },
+      { "platform": "windows", "name": "ColorPicker (WinUI)", "visualNotes": "Square spectrum picker with hue ring or slider. Includes hex, RGB, HSV inputs.", "behaviorNotes": "Supports color spectrum, color preview, and text input. Optional alpha channel.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/color-picker" },
+      { "platform": "web", "name": "input[type=color] / custom picker", "visualNotes": "Native color input shows a browser-specific picker. Custom pickers provide richer UIs.", "behaviorNotes": "Native input returns hex value. Custom pickers use canvas for spectrum. EyeDropper API available in Chromium.", "referenceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/color" }
+    ]
+  },
+  {
+    "slug": "toolbar",
+    "name": "Toolbar",
+    "alternativeNames": ["UIToolbar", "NSToolbar", "Action Bar", "Command Bar", "Bottom App Bar"],
+    "platforms": ["ios", "macos", "android", "windows", "web"],
+    "category": "actions",
+    "description": "A bar containing action buttons and controls relevant to the current content or context, distinct from navigation bars.",
+    "anatomy": {
+      "parts": [
+        { "label": "Action Buttons", "description": "Icon or text buttons for performing actions on the current content." },
+        { "label": "Spacer / Flexible Space", "description": "Flexible gaps that distribute buttons evenly or group them." },
+        { "label": "Separator", "description": "Divider between logical groups of toolbar items." },
+        { "label": "Overflow Menu", "description": "Menu (···) for additional actions that don't fit in the toolbar." },
+        { "label": "Bar Background", "description": "The toolbar's background surface, which may be translucent." }
+      ]
+    },
+    "placement": {
+      "position": "Bottom of the screen (iOS), top of window (macOS, Windows), or contextual",
+      "fixed": true,
+      "overlay": false,
+      "context": "Used in content editors, email, messaging, and any screen with multiple actions."
+    },
+    "behavior": {
+      "appears": "Always visible or shown contextually when actions are available.",
+      "interaction": "Tap action buttons to execute commands. May hide on scroll.",
+      "dismissal": "Not dismissible; persists while context requires actions.",
+      "blocking": false,
+      "gestures": ["Scroll to hide/show (some platforms)"]
+    },
+    "platformVariations": [
+      { "platform": "ios", "name": "UIToolbar", "visualNotes": "Bottom bar with icon-only buttons and flexible spacing. Translucent with blur.", "behaviorNotes": "Appears at the bottom of a navigation controller. Hides on push navigation in some contexts.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/toolbars" },
+      { "platform": "macos", "name": "NSToolbar", "visualNotes": "Top toolbar integrated with the window title bar. Supports icons, labels, and mixed.", "behaviorNotes": "User-customizable item set. Supports flexible space, groups, and overflow. Integrates with touch bar.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/toolbars" },
+      { "platform": "android", "name": "Bottom App Bar / Toolbar (Material 3)", "visualNotes": "Bottom app bar with action icons and optional FAB cradle. Top toolbar for contextual actions.", "behaviorNotes": "Bottom app bar scrolls away on scroll. Can host a centered or end FAB. Supports contextual action mode.", "referenceUrl": "https://m3.material.io/components/toolbars/overview" },
+      { "platform": "windows", "name": "CommandBar (WinUI)", "visualNotes": "Top bar with primary and secondary command buttons. Overflow menu for additional commands.", "behaviorNotes": "Supports compact, minimal, and hidden display modes. Secondary commands in overflow flyout.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/command-bar" },
+      { "platform": "web", "name": "Toolbar (ARIA)", "visualNotes": "Horizontal grouping of buttons and controls. Styled with CSS frameworks.", "behaviorNotes": "Use role='toolbar' for the container. Arrow keys navigate between items. Tab moves focus out of the toolbar.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/" }
+    ]
+  },
+  {
+    "slug": "menu-button",
+    "name": "Menu Button / Split Button",
+    "alternativeNames": ["Split Button", "Pull-Down Button", "DropdownButton", "MenuButton", "SplitButton"],
+    "platforms": ["macos", "android", "windows", "web"],
+    "category": "actions",
+    "description": "A button that opens a dropdown menu of related actions, or a split button combining a default action with a dropdown for alternatives.",
+    "anatomy": {
+      "parts": [
+        { "label": "Primary Action Area", "description": "The main clickable area that either opens the menu or triggers the default action." },
+        { "label": "Dropdown Arrow", "description": "A chevron or arrow indicator that the button opens a menu." },
+        { "label": "Divider (Split)", "description": "Vertical line separating the primary action from the dropdown trigger in split buttons." },
+        { "label": "Dropdown Menu", "description": "The list of alternative actions that appears on click." }
+      ]
+    },
+    "placement": {
+      "position": "Inline within toolbars, forms, and action areas",
+      "fixed": false,
+      "overlay": true,
+      "context": "Used when a primary action has related alternatives (Save/Save As, Reply/Reply All)."
+    },
+    "behavior": {
+      "appears": "Always visible where a set of related actions exists.",
+      "interaction": "Click the button to trigger default action or open the menu; click arrow for menu in split variant.",
+      "dismissal": "Menu closes on item selection, outside click, or Escape.",
+      "blocking": false,
+      "gestures": ["Click for menu", "Long-press for alternative actions (mobile)"]
+    },
+    "platformVariations": [
+      { "platform": "macos", "name": "NSPopUpButton (pull-down) / NSSegmentedControl", "visualNotes": "Pull-down button with downward arrow; distinct from pop-up buttons which show current value.", "behaviorNotes": "Click opens menu below the button. Keyboard: Space opens, arrow keys navigate.", "referenceUrl": "https://developer.apple.com/design/human-interface-guidelines/pull-down-buttons" },
+      { "platform": "android", "name": "Split Button (Material 3)", "visualNotes": "Divided button with primary action and trailing dropdown arrow.", "behaviorNotes": "Primary area triggers default action. Trailing area opens a dropdown menu of alternatives.", "referenceUrl": "https://m3.material.io/components/split-button/overview" },
+      { "platform": "windows", "name": "SplitButton / DropDownButton (WinUI)", "visualNotes": "Button with a divider and dropdown chevron. Supports toggle split button variant.", "behaviorNotes": "Primary click triggers action. Chevron click opens flyout menu. Keyboard: Alt+Down opens menu.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/buttons" },
+      { "platform": "web", "name": "Menu Button (ARIA)", "visualNotes": "Button with dropdown arrow that opens a menu. Often part of button groups in toolbars.", "behaviorNotes": "Use aria-haspopup='menu' and aria-expanded. Enter/Space opens menu. Arrow keys navigate menu items.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/" }
+    ]
+  },
+  {
+    "slug": "rating",
+    "name": "Rating Indicator",
+    "alternativeNames": ["Rating Control", "Star Rating", "Rating Stars", "Review Rating"],
+    "platforms": ["macos", "windows", "web"],
+    "category": "input",
+    "description": "A control displaying a row of stars (or other symbols) that lets users view or set a rating value.",
+    "anatomy": {
+      "parts": [
+        { "label": "Rating Symbols", "description": "Row of star (or custom) icons representing the rating scale." },
+        { "label": "Filled State", "description": "Filled icons representing the current rating value." },
+        { "label": "Empty State", "description": "Outlined or dimmed icons for unrated positions." },
+        { "label": "Half-Star", "description": "Optional partial fill for half-point ratings." },
+        { "label": "Label / Caption", "description": "Optional text showing the numeric value or description." }
+      ]
+    },
+    "placement": {
+      "position": "Inline within reviews, product pages, and feedback forms",
+      "fixed": false,
+      "overlay": false,
+      "context": "Used for product reviews, content ratings, feedback forms, and quality indicators."
+    },
+    "behavior": {
+      "appears": "Read-only when displaying existing ratings; interactive in input mode.",
+      "interaction": "Click or tap a star to set the rating; hover to preview (desktop).",
+      "dismissal": "Not dismissible; persists as an input or display control.",
+      "blocking": false,
+      "gestures": ["Tap to rate", "Drag across stars", "Arrow keys to adjust (keyboard)"]
+    },
+    "platformVariations": [
+      { "platform": "macos", "name": "NSLevelIndicator (rating)", "visualNotes": "Row of stars with system styling; supports 0–5 scale.", "behaviorNotes": "Supports editable and read-only modes. Can display partial stars for half ratings.", "referenceUrl": "https://developer.apple.com/documentation/appkit/nslevelindicator" },
+      { "platform": "windows", "name": "RatingControl (WinUI)", "visualNotes": "Row of star glyphs with Fluent Design. Supports custom max value and placeholder value.", "behaviorNotes": "Interactive or read-only. Supports half-star precision. Keyboard accessible with arrow keys.", "referenceUrl": "https://learn.microsoft.com/en-us/windows/apps/design/controls/rating" },
+      { "platform": "web", "name": "Star Rating (custom)", "visualNotes": "Custom star icons using SVG or Unicode characters. Styled with CSS for filled/empty states.", "behaviorNotes": "Use role='slider' with aria-valuenow, aria-valuemin, aria-valuemax. Arrow keys adjust value. Tab to focus.", "referenceUrl": "https://www.w3.org/WAI/ARIA/apg/patterns/slider/" }
     ]
   }
 ]

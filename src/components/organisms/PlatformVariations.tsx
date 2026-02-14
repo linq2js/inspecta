@@ -1,12 +1,16 @@
 import { Badge } from '@/components/atoms/Badge'
-import type { UIComponent } from '@/types'
+import { Icon } from '@/components/atoms/Icon'
+import type { PlatformId, UIComponent } from '@/types'
 
 interface Props {
   component: UIComponent
+  activePlatform?: PlatformId | null
 }
 
-export function PlatformVariations({ component }: Props) {
-  const variations = component.platformVariations
+export function PlatformVariations({ component, activePlatform = null }: Props) {
+  const variations = activePlatform
+    ? component.platformVariations.filter((v) => v.platform === activePlatform)
+    : component.platformVariations
 
   return (
     <section id="platform-variations" className="scroll-mt-20">
@@ -24,6 +28,18 @@ export function PlatformVariations({ component }: Props) {
               <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                 {v.name}
               </span>
+              {v.referenceUrl && (
+                <a
+                  href={v.referenceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-auto inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium text-violet-600 transition-colors hover:bg-violet-50 hover:text-violet-700 dark:text-violet-400 dark:hover:bg-violet-950 dark:hover:text-violet-300"
+                  title="View official reference"
+                >
+                  Reference
+                  <Icon name="externalLink" size={12} />
+                </a>
+              )}
             </div>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div>

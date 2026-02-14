@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Icon } from '@/components/atoms/Icon'
 import { ComponentOverview } from '@/components/organisms/ComponentOverview'
@@ -7,7 +8,7 @@ import { ComponentBehavior } from '@/components/organisms/ComponentBehavior'
 import { PlatformVariations } from '@/components/organisms/PlatformVariations'
 import { DetailSidebar } from '@/components/organisms/DetailSidebar'
 import { categoryMap } from '@/data/categories'
-import type { UIComponent } from '@/types'
+import type { PlatformId, UIComponent } from '@/types'
 
 interface DetailTemplateProps {
   component: UIComponent
@@ -15,6 +16,11 @@ interface DetailTemplateProps {
 
 export function DetailTemplate({ component }: DetailTemplateProps) {
   const cat = categoryMap[component.category]
+  const [activePlatform, setActivePlatform] = useState<PlatformId | null>(null)
+
+  const togglePlatform = useCallback((platform: PlatformId) => {
+    setActivePlatform((prev) => (prev === platform ? null : platform))
+  }, [])
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
@@ -44,11 +50,18 @@ export function DetailTemplate({ component }: DetailTemplateProps) {
       <div className="flex gap-8">
         {/* Main content */}
         <div className="min-w-0 flex-1 space-y-10">
-          <ComponentOverview component={component} />
+          <ComponentOverview
+            component={component}
+            activePlatform={activePlatform}
+            onTogglePlatform={togglePlatform}
+          />
           <ComponentAnatomy component={component} />
           <ComponentPlacement component={component} />
           <ComponentBehavior component={component} />
-          <PlatformVariations component={component} />
+          <PlatformVariations
+            component={component}
+            activePlatform={activePlatform}
+          />
         </div>
 
         {/* Sidebar */}

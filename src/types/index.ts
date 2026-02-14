@@ -35,6 +35,7 @@ export interface PlatformVariation {
   name: string
   visualNotes: string
   behaviorNotes: string
+  referenceUrl?: string
 }
 
 export interface UIComponent {

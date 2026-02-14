@@ -26,7 +26,7 @@ function getDisplayName(
         )
 
   const unique = [...new Set(variations.map((v) => v.name))]
-  return unique.length > 0 ? unique.join(' / ') : component.name
+  return unique.length > 0 ? unique.join(' · ') : component.name
 }
 
 export function ComponentCard({ component, activePlatforms = [] }: ComponentCardProps) {
