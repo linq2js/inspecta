@@ -44,13 +44,14 @@ export const usePromptStore = create<PromptState>((set, get) => ({
 export function buildAnnotationBlock(
   items: UnifiedItem[],
   compositeDims: { w: number; h: number } | null,
+  options?: { skipDimensions?: boolean },
 ): string {
   if (items.length === 0) return ''
 
-  const dimSuffix = compositeDims
-    ? ` ${Math.round(compositeDims.w)}×${Math.round(compositeDims.h)}px`
-    : ''
-  let lines = `\n## Annotations\n\nImage dimensions:${dimSuffix}\n\n`
+  let lines = '\n## Annotations\n\n'
+  if (!options?.skipDimensions && compositeDims) {
+    lines += `Image dimensions: ${Math.round(compositeDims.w)}×${Math.round(compositeDims.h)}px\n\n`
+  }
   for (const item of items) {
     if (item.kind === 'arrow' && item.arrow) {
       lines += `- **[${item.index}]** arrow from (${Math.round(item.arrow.x1)},${Math.round(item.arrow.y1)}) to (${Math.round(item.arrow.x2)},${Math.round(item.arrow.y2)})`
@@ -121,7 +122,11 @@ export function buildImageMetaBlock(
     : ''
   let lines = `\n## Images${dimSuffix}\n\n`
   for (const img of images) {
-    lines += `- **[Image ${img.displayId}]** ${img.dimensions.w}×${img.dimensions.h}px at (${Math.round(img.x)}, ${Math.round(img.y)})\n`
+    lines += `- **[Image ${img.displayId}]** ${img.dimensions.w}×${img.dimensions.h}px at (${Math.round(img.x)}, ${Math.round(img.y)})`
+    if (img.note.trim()) {
+      lines += ` — ${img.note.trim()}`
+    }
+    lines += '\n'
   }
   return lines
 }

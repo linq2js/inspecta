@@ -41,6 +41,7 @@ interface ImageState {
   setSelectedLayer: (id: string | null) => void
   moveLayer: (id: string, x: number, y: number) => void
   reorderLayer: (id: string, newIndex: number) => void
+  setImageNote: (id: string, note: string) => void
   setShowImageIds: (show: boolean) => void
   setIncludeImageMeta: (include: boolean) => void
   canUndoImage: () => boolean
@@ -57,7 +58,7 @@ export const useImageStore = create<ImageState>((set, get) => ({
   canvasBounds: computeCanvasBounds([]),
   selectedLayerId: null,
   showImageIds: true,
-  includeImageMeta: false,
+  includeImageMeta: true,
   imageHistory: [{ images: [] }],
   imageHistoryIndex: 0,
 
@@ -76,6 +77,7 @@ export const useImageStore = create<ImageState>((set, get) => ({
         dimensions,
         x,
         y,
+        note: '',
       }
       const newImages = [...state.images, entry]
       return {
@@ -104,6 +106,13 @@ export const useImageStore = create<ImageState>((set, get) => ({
     }),
 
   setSelectedLayer: (id) => set({ selectedLayerId: id }),
+
+  setImageNote: (id, note) =>
+    set((state) => ({
+      images: state.images.map((img) =>
+        img.id === id ? { ...img, note } : img,
+      ),
+    })),
 
   setShowImageIds: (show) => set({ showImageIds: show }),
 

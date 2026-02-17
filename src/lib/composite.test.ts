@@ -15,6 +15,7 @@ const makeImage = (
   dimensions: { w, h },
   x,
   y,
+  note: '',
 })
 
 describe('computeCanvasBounds', () => {

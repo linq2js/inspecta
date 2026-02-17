@@ -100,6 +100,8 @@ export interface ImageEntry {
   /** Position on the canvas in pixel space */
   x: number
   y: number
+  /** Optional user note for this image */
+  note: string
 }
 
 export interface CanvasBounds {

@@ -45,7 +45,7 @@ export function IdentifyTemplate() {
       canvasBounds.totalWidth > 0
         ? { w: canvasBounds.totalWidth, h: canvasBounds.totalHeight }
         : null
-    const annotationBlock = buildAnnotationBlock(items, compositeDims)
+    const annotationBlock = buildAnnotationBlock(items, compositeDims, { skipDimensions: includeImageMeta })
     const imageMetaBlock = includeImageMeta
       ? buildImageMetaBlock(images, compositeDims)
       : ''
@@ -237,7 +237,7 @@ function PreviewMode({
     canvasBounds.totalWidth > 0
       ? { w: canvasBounds.totalWidth, h: canvasBounds.totalHeight }
       : null
-  const annotationBlock = buildAnnotationBlock(items, compositeDims)
+  const annotationBlock = buildAnnotationBlock(items, compositeDims, { skipDimensions: includeImageMeta })
   const imageMetaBlock = includeImageMeta
     ? buildImageMetaBlock(images, compositeDims)
     : ''
@@ -282,36 +282,6 @@ function PreviewMode({
       <div className="mb-3 flex h-8 shrink-0 items-center gap-2">
         {hasImages && (
           <>
-            <button
-              type="button"
-              onClick={() => setIncludeImageMeta(!includeImageMeta)}
-              title={
-                includeImageMeta
-                  ? 'Image meta ON — IDs shown on image, image list appended to prompt'
-                  : 'Image meta OFF — no IDs on image, no image list in prompt'
-              }
-              className={`flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium transition-colors ${
-                includeImageMeta
-                  ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-500 dark:bg-blue-950/40 dark:text-blue-300'
-                  : 'border-zinc-300 text-zinc-500 hover:border-zinc-400 dark:border-zinc-600 dark:text-zinc-400 dark:hover:border-zinc-500'
-              }`}
-            >
-              <svg
-                width={14}
-                height={14}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <path d="M21 15l-5-5L5 21" />
-              </svg>
-              Image Meta
-            </button>
             <Button
               variant="secondary"
               size="sm"
@@ -330,6 +300,38 @@ function PreviewMode({
               <Icon name="download" size={14} />
               Download
             </Button>
+            <div className="ml-auto">
+              <button
+                type="button"
+                onClick={() => setIncludeImageMeta(!includeImageMeta)}
+                title={
+                  includeImageMeta
+                    ? 'Image meta ON — IDs shown on image, image list appended to prompt'
+                    : 'Image meta OFF — no IDs on image, no image list in prompt'
+                }
+                className={`flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium transition-colors ${
+                  includeImageMeta
+                    ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-500 dark:bg-blue-950/40 dark:text-blue-300'
+                    : 'border-zinc-300 text-zinc-500 hover:border-zinc-400 dark:border-zinc-600 dark:text-zinc-400 dark:hover:border-zinc-500'
+                }`}
+              >
+                <svg
+                  width={14}
+                  height={14}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <path d="M21 15l-5-5L5 21" />
+                </svg>
+                Image Meta
+              </button>
+            </div>
           </>
         )}
       </div>
