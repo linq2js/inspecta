@@ -704,6 +704,7 @@ export function ImageCanvas() {
             width: displayW,
             height: displayH,
             position: 'relative',
+            boxShadow: '0 0 30px 8px rgba(0, 0, 0, 0.5)',
           }}
         >
           {/* Render each image at its position (array order = z-order, index 0 = back) */}

@@ -43,7 +43,7 @@ export function UnifiedItemList() {
 
       <div ref={listRef} className="min-h-0 flex-1 overflow-y-auto">
         {items.length > 0 ? (
-          <div className="space-y-2">
+          <div className="grid grid-cols-1 gap-2 min-[1600px]:grid-cols-2">
             {items.map((item) => {
               const isSelected = item.id === selectedItemId
               return (
