@@ -28,11 +28,16 @@ export function Button({
   size = 'md',
   className = '',
   children,
+  onClick,
   ...props
 }: ButtonProps) {
   return (
     <button
       className={`inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:opacity-50 disabled:pointer-events-none ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      onClick={(e) => {
+        e.currentTarget.blur()
+        onClick?.(e)
+      }}
       {...props}
     >
       {children}

@@ -1,4 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <rect width="32" height="32" rx="6" fill="#7c3aed"/>
-  <text x="16" y="22" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="white">In</text>
+  <!-- Wand -->
+  <line x1="7" y1="26" x2="18" y2="15" stroke="white" stroke-width="2.8" stroke-linecap="round"/>
+  <!-- Sparkle (4-point star) -->
+  <path d="M23.5,5 L24.8,8.5 L28,9.5 L24.8,10.5 L23.5,14 L22.2,10.5 L19,9.5 L22.2,8.5 Z" fill="white"/>
+  <!-- Accent dots -->
+  <circle cx="14" cy="8.5" r="1.1" fill="white" opacity="0.65"/>
+  <circle cx="26.5" cy="18" r="0.9" fill="white" opacity="0.45"/>
 </svg>

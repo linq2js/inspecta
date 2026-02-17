@@ -88,7 +88,11 @@ function buildAnnotationList(
   let lines = `Image dimensions:${dimSuffix}\n\n`
   lines += 'Annotations:\n'
   for (const item of items) {
-    lines += `[${item.index}] at (x:${Math.round(item.rect.x)}px y:${Math.round(item.rect.y)}px w:${Math.round(item.rect.width)}px h:${Math.round(item.rect.height)}px)\n`
+    if (item.kind === 'arrow' && item.arrow) {
+      lines += `[${item.index}] arrow from (${Math.round(item.arrow.x1)},${Math.round(item.arrow.y1)}) to (${Math.round(item.arrow.x2)},${Math.round(item.arrow.y2)})\n`
+    } else {
+      lines += `[${item.index}] at (x:${Math.round(item.rect.x)}px y:${Math.round(item.rect.y)}px w:${Math.round(item.rect.width)}px h:${Math.round(item.rect.height)}px)\n`
+    }
   }
   return lines
 }
@@ -183,8 +187,10 @@ export const useIdentifyStore = create<IdentifyState>((set, get) => ({
       index: i + 1,
       id: a.id,
       type: 'annotation' as const,
-      label: 'User annotation',
+      kind: a.kind,
+      label: a.kind === 'arrow' ? 'Arrow annotation' : 'User annotation',
       rect: a.rect,
+      arrow: a.arrow,
       note: a.note,
     }))
   },
@@ -203,6 +209,7 @@ export const useIdentifyStore = create<IdentifyState>((set, get) => ({
     annotationCounter++
     const annotation: DrawnAnnotation = {
       id: `ann-${annotationCounter}-${Date.now()}`,
+      kind: 'box',
       rect,
       note: '',
     }

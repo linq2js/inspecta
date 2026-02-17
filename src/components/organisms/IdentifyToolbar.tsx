@@ -1,75 +1,94 @@
 import { useRef, useCallback, useEffect } from 'react'
 import { Button } from '@/components/atoms/Button'
 import { Icon } from '@/components/atoms/Icon'
-import { useIdentifyStore } from '@/stores/useIdentifyStore'
+import { DeviceFrameInserter } from '@/components/molecules/DeviceFrameInserter'
+import { useImageStore } from '@/stores/useImageStore'
+import { useAnnotationStore } from '@/stores/useAnnotationStore'
+import { usePromptStore } from '@/stores/usePromptStore'
+
+/** Read an image File and call addImage on the store directly */
+function loadImageFile(file: File) {
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const dataUrl = e.target?.result as string
+    const img = new Image()
+    img.onload = () => {
+      useImageStore.getState().addImage(dataUrl, {
+        w: img.naturalWidth,
+        h: img.naturalHeight,
+      })
+    }
+    img.src = dataUrl
+  }
+  reader.readAsDataURL(file)
+}
 
 export function IdentifyToolbar() {
-  const { setImage, reset, image, annotations, undo, redo, canUndo, canRedo } =
-    useIdentifyStore()
+  const {
+    images,
+    canUndoImage,
+    canRedoImage,
+    undoImage,
+    redoImage,
+    resetImages,
+  } = useImageStore()
+  const { annotations, canUndo, canRedo, undo, redo, resetAnnotations } =
+    useAnnotationStore()
+  const { resetPrompt } = usePromptStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  /** Guard: confirm before replacing existing image that has annotations */
-  const confirmIfNeeded = useCallback((): boolean => {
-    if (!image || annotations.length === 0) return true
-    return window.confirm(
-      'You have existing annotations. Loading a new image will discard them. Continue?',
-    )
-  }, [image, annotations])
-
-  const handleFile = useCallback(
-    (file: File) => {
-      if (!confirmIfNeeded()) return
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const dataUrl = e.target?.result as string
-        const img = new Image()
-        img.onload = () => {
-          setImage(dataUrl, { w: img.naturalWidth, h: img.naturalHeight })
-        }
-        img.src = dataUrl
-      }
-      reader.readAsDataURL(file)
-    },
-    [setImage, confirmIfNeeded],
-  )
-
-  const handlePaste = useCallback(
-    async (e: ClipboardEvent) => {
+  // Global paste listener — capture phase so it fires BEFORE the textarea processes it
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
       const items = e.clipboardData?.items
       if (!items) return
-      for (const item of items) {
-        if (item.type.startsWith('image/')) {
-          const file = item.getAsFile()
-          if (file) handleFile(file)
-          break
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith('image/')) {
+          e.preventDefault()
+          e.stopPropagation()
+          const file = items[i].getAsFile()
+          if (file) loadImageFile(file)
+          return
         }
       }
-    },
-    [handleFile],
-  )
-
-  useEffect(() => {
-    const listener = handlePaste as unknown as EventListener
-    document.addEventListener('paste', listener)
-    return () => document.removeEventListener('paste', listener)
-  }, [handlePaste])
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault()
-      const file = e.dataTransfer.files[0]
-      if (file?.type.startsWith('image/')) handleFile(file)
-    },
-    [handleFile],
-  )
+    }
+    // capture: true — fires before any element's own paste handler
+    document.addEventListener('paste', onPaste, true)
+    return () => document.removeEventListener('paste', onPaste, true)
+  }, [])
 
   const handleReset = useCallback(() => {
-    if (annotations.length > 0) {
-      if (!window.confirm('Discard all annotations and reset? This cannot be undone.'))
+    if (images.length > 0 || annotations.length > 0) {
+      if (
+        !window.confirm(
+          'Discard all images, annotations, and prompt content? This cannot be undone.',
+        )
+      )
         return
     }
-    reset()
-  }, [reset, annotations])
+    resetImages()
+    resetAnnotations()
+    resetPrompt()
+  }, [resetImages, resetAnnotations, resetPrompt, images, annotations])
+
+  const handleUndo = useCallback(() => {
+    if (canUndo()) {
+      undo()
+    } else if (canUndoImage()) {
+      undoImage()
+    }
+  }, [canUndo, undo, canUndoImage, undoImage])
+
+  const handleRedo = useCallback(() => {
+    if (canRedo()) {
+      redo()
+    } else if (canRedoImage()) {
+      redoImage()
+    }
+  }, [canRedo, redo, canRedoImage, redoImage])
+
+  const canUndoAny = canUndo() || canUndoImage()
+  const canRedoAny = canRedo() || canRedoImage()
 
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900">
@@ -80,7 +99,8 @@ export function IdentifyToolbar() {
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0]
-          if (file) handleFile(file)
+          if (file) loadImageFile(file)
+          if (fileInputRef.current) fileInputRef.current.value = ''
         }}
       />
 
@@ -93,23 +113,19 @@ export function IdentifyToolbar() {
         Upload
       </Button>
 
-      <div
-        className="flex items-center gap-1 rounded-md border border-dashed border-zinc-300 px-3 py-1.5 text-xs text-zinc-400 dark:border-zinc-600"
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={handleDrop}
-      >
-        Drop image or Ctrl+V to paste
-      </div>
+      <div className="h-6 w-px bg-zinc-200 dark:bg-zinc-700" />
 
-      {image && (
+      <DeviceFrameInserter />
+
+      {images.length > 0 && (
         <>
           <div className="h-6 w-px bg-zinc-200 dark:bg-zinc-700" />
 
           <Button
             variant="ghost"
             size="sm"
-            onClick={undo}
-            disabled={!canUndo()}
+            onClick={handleUndo}
+            disabled={!canUndoAny}
             title="Undo (Ctrl+Z)"
           >
             Undo
@@ -117,14 +133,33 @@ export function IdentifyToolbar() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={redo}
-            disabled={!canRedo()}
+            onClick={handleRedo}
+            disabled={!canRedoAny}
             title="Redo (Ctrl+Shift+Z)"
           >
             Redo
           </Button>
 
           <div className="h-6 w-px bg-zinc-200 dark:bg-zinc-700" />
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              if (
+                !window.confirm(
+                  'Remove all images and annotations? This cannot be undone.',
+                )
+              )
+                return
+              resetImages()
+              resetAnnotations()
+            }}
+            title="Remove all images and annotations"
+          >
+            <Icon name="trash" size={14} />
+            Remove Image
+          </Button>
 
           <Button variant="ghost" size="sm" onClick={handleReset}>
             Reset

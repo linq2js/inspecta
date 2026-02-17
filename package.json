@@ -1,6 +1,6 @@
 {
-  "name": "inspecta",
-  "description": "Upload screenshots, annotate UI regions, pick colors, and generate bug-reporting prompts. A cross-platform UI component reference library.",
+  "name": "prompt-assistant",
+  "description": "Write prompts with markdown, annotate images, manage snippets and templates, and export to AI agents.",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -12,11 +12,16 @@
     "test": "jest"
   },
   "dependencies": {
+    "@tailwindcss/typography": "^0.5.19",
     "@tanstack/react-router": "^1.159.5",
     "@tanstack/router-devtools": "^1.159.5",
+    "dexie": "^4.3.0",
+    "dexie-react-hooks": "^4.2.0",
     "fuse.js": "^7.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "workbox-window": "^7.4.0",
     "zustand": "^5.0.11"
   },

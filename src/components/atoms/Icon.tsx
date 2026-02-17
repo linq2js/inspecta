@@ -135,6 +135,34 @@ const icons = {
       d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
     />
   ),
+  devicePhone: (
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"
+    />
+  ),
+  plus: (
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M12 4.5v15m7.5-7.5h-15"
+    />
+  ),
+  arrowUpRight: (
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M4.5 19.5 19.5 4.5m0 0H8.25m11.25 0v11.25"
+    />
+  ),
+  squareOutline: (
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9A2.25 2.25 0 0 1 5.25 16.5v-9Z"
+    />
+  ),
 } as const
 
 export type IconName = keyof typeof icons

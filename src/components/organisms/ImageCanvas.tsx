@@ -1,6 +1,8 @@
 import { useRef, useCallback, useState, useEffect } from 'react'
-import { useIdentifyStore } from '@/stores/useIdentifyStore'
+import { useImageStore } from '@/stores/useImageStore'
+import { useAnnotationStore } from '@/stores/useAnnotationStore'
 import { useColorPicker } from '@/hooks/useColorPicker'
+import { Icon } from '@/components/atoms/Icon'
 import type { PixelRect } from '@/types'
 
 const BADGE_PAD = 14
@@ -8,22 +10,35 @@ const MIN_ZOOM = 0.5
 const MAX_ZOOM = 5
 const ZOOM_STEP = 0.2
 
-type InteractionMode = 'idle' | 'drawing' | 'panning'
+type InteractionMode = 'idle' | 'drawing' | 'panning' | 'moving'
 
 export function ImageCanvas() {
+  const { images, canvasBounds, selectedLayerId, setSelectedLayer, moveLayer, showImageIds } =
+    useImageStore()
   const {
-    image,
-    imageDimensions,
     getUnifiedList,
     selectedItemId,
     setSelected,
     addAnnotation,
+    addArrowAnnotation,
     removeAnnotation,
+    drawingTool,
+    setDrawingTool,
     undo,
     redo,
-  } = useIdentifyStore()
+  } = useAnnotationStore()
 
-  const colorPicker = useColorPicker({ imageSrc: image, imageDimensions })
+  const compositeDims =
+    canvasBounds.totalWidth > 0
+      ? { w: canvasBounds.totalWidth, h: canvasBounds.totalHeight }
+      : null
+
+  // Color picker uses first image for sampling (simplified)
+  const firstImage = images[0] ?? null
+  const colorPicker = useColorPicker({
+    imageSrc: firstImage?.dataUrl ?? null,
+    imageDimensions: firstImage?.dimensions ?? null,
+  })
 
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerSize, setContainerSize] = useState({ w: 0, h: 0 })
@@ -31,7 +46,7 @@ export function ImageCanvas() {
   // Zoom & pan
   const [zoom, setZoom] = useState(1)
   const [pan, setPan] = useState({ x: 0, y: 0 })
-  const [fitScale, setFitScale] = useState(1) // scale that fits image into container
+  const [fitScale, setFitScale] = useState(1)
 
   // Interaction
   const [mode, setMode] = useState<InteractionMode>('idle')
@@ -41,11 +56,24 @@ export function ImageCanvas() {
     currentX: number
     currentY: number
   } | null>(null)
-  const panStart = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null)
+  const panStart = useRef<{
+    x: number
+    y: number
+    panX: number
+    panY: number
+  } | null>(null)
+
+  // Layer drag state
+  const layerDragStart = useRef<{
+    imageX: number
+    imageY: number
+    clientX: number
+    clientY: number
+  } | null>(null)
 
   const items = getUnifiedList()
 
-  // Measure container width (height is unreliable before image loads)
+  // Measure container width
   useEffect(() => {
     if (!containerRef.current) return
     const ro = new ResizeObserver((entries) => {
@@ -56,81 +84,127 @@ export function ImageCanvas() {
     return () => ro.disconnect()
   }, [])
 
-  // Compute fit scale based on container width and a fixed max height
+  // Compute fit scale based on composite dimensions
   useEffect(() => {
-    if (!imageDimensions || containerSize.w <= 0) return
+    if (!compositeDims || containerSize.w <= 0) return
     const MAX_H = 600
     const availW = containerSize.w
-    const s = Math.min(availW / imageDimensions.w, MAX_H / imageDimensions.h, 1)
+    const s = Math.min(
+      availW / compositeDims.w,
+      MAX_H / compositeDims.h,
+      1,
+    )
     setFitScale(s)
     setZoom(1)
-    // Center after fitScale update — defer to let layout settle
     requestAnimationFrame(() => {
       const el = containerRef.current
       if (!el) return
       const cw = el.clientWidth - BADGE_PAD * 2
       const ch = el.clientHeight - BADGE_PAD * 2
-      const iw = imageDimensions.w * s
-      const ih = imageDimensions.h * s
+      const iw = compositeDims.w * s
+      const ih = compositeDims.h * s
       setPan({
         x: Math.max(0, (cw - iw) / 2),
         y: Math.max(0, (ch - ih) / 2),
       })
     })
-  }, [imageDimensions, containerSize.w])
+  }, [compositeDims?.w, compositeDims?.h, containerSize.w])
 
-  // Effective display dimensions
   const effectiveScale = fitScale * zoom
-  const displayW = imageDimensions ? imageDimensions.w * effectiveScale : 0
-  const displayH = imageDimensions ? imageDimensions.h * effectiveScale : 0
+  const displayW = compositeDims ? compositeDims.w * effectiveScale : 0
+  const displayH = compositeDims ? compositeDims.h * effectiveScale : 0
 
-  /** Compute pan offset to center the image in the container */
   const centerPan = useCallback(() => {
     const el = containerRef.current
-    if (!el || !imageDimensions) return { x: 0, y: 0 }
+    if (!el || !compositeDims) return { x: 0, y: 0 }
     const cw = el.clientWidth - BADGE_PAD * 2
     const ch = el.clientHeight - BADGE_PAD * 2
-    const iw = imageDimensions.w * fitScale
-    const ih = imageDimensions.h * fitScale
+    const iw = compositeDims.w * fitScale
+    const ih = compositeDims.h * fitScale
     return {
       x: Math.max(0, (cw - iw) / 2),
       y: Math.max(0, (ch - ih) / 2),
     }
-  }, [imageDimensions, fitScale])
+  }, [compositeDims, fitScale])
 
-  // Convert client coords → original image pixel coords
+  // Convert client coords to composite pixel coords
   const toPixelCoords = useCallback(
     (clientX: number, clientY: number) => {
       const el = containerRef.current
-      if (!el || !imageDimensions) return { px: 0, py: 0 }
+      if (!el || !compositeDims) return { px: 0, py: 0 }
       const rect = el.getBoundingClientRect()
       const offsetX = clientX - rect.left - BADGE_PAD - pan.x
       const offsetY = clientY - rect.top - BADGE_PAD - pan.y
       return {
-        px: Math.max(0, Math.min(imageDimensions.w, offsetX / effectiveScale)),
-        py: Math.max(0, Math.min(imageDimensions.h, offsetY / effectiveScale)),
+        px: Math.max(
+          0,
+          Math.min(compositeDims.w, offsetX / effectiveScale),
+        ),
+        py: Math.max(
+          0,
+          Math.min(compositeDims.h, offsetY / effectiveScale),
+        ),
       }
     },
-    [effectiveScale, imageDimensions, pan],
+    [effectiveScale, compositeDims, pan],
+  )
+
+  /** Check if a pixel coord falls within the selected layer */
+  const isInsideSelectedLayer = useCallback(
+    (px: number, py: number) => {
+      if (!selectedLayerId) return false
+      const layer = images.find((img) => img.id === selectedLayerId)
+      if (!layer) return false
+      return (
+        px >= layer.x &&
+        px <= layer.x + layer.dimensions.w &&
+        py >= layer.y &&
+        py <= layer.y + layer.dimensions.h
+      )
+    },
+    [selectedLayerId, images],
   )
 
   // ── Mouse handlers ──
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
-      // Middle-click or Space+click → pan (always allowed, even in color picker)
       if (e.button === 1 || (e.button === 0 && e.altKey)) {
         setMode('panning')
-        panStart.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y }
+        panStart.current = {
+          x: e.clientX,
+          y: e.clientY,
+          panX: pan.x,
+          panY: pan.y,
+        }
         e.preventDefault()
         return
       }
       if (e.button !== 0) return
 
-      // Color picker mode — pick on click
       if (colorPicker.active) {
         const { px, py } = toPixelCoords(e.clientX, e.clientY)
         colorPicker.onPick(px, py)
+        return
+      }
+
+      // If a layer is selected, check if click is inside it → start moving
+      // Clicking outside the layer deselects it without starting a draw
+      if (selectedLayerId) {
+        const { px, py } = toPixelCoords(e.clientX, e.clientY)
+        if (isInsideSelectedLayer(px, py)) {
+          const layer = images.find((img) => img.id === selectedLayerId)!
+          setMode('moving')
+          layerDragStart.current = {
+            imageX: layer.x,
+            imageY: layer.y,
+            clientX: e.clientX,
+            clientY: e.clientY,
+          }
+          e.preventDefault()
+          return
+        }
+        setSelectedLayer(null)
         return
       }
 
@@ -138,7 +212,7 @@ export function ImageCanvas() {
       const { px, py } = toPixelCoords(e.clientX, e.clientY)
       setDrawing({ startX: px, startY: py, currentX: px, currentY: py })
     },
-    [toPixelCoords, pan, colorPicker],
+    [toPixelCoords, pan, colorPicker, selectedLayerId, isInsideSelectedLayer, images, setSelectedLayer],
   )
 
   const handleMouseMove = useCallback(
@@ -146,11 +220,24 @@ export function ImageCanvas() {
       if (mode === 'panning' && panStart.current) {
         const dx = e.clientX - panStart.current.x
         const dy = e.clientY - panStart.current.y
-        setPan({ x: panStart.current.panX + dx, y: panStart.current.panY + dy })
+        setPan({
+          x: panStart.current.panX + dx,
+          y: panStart.current.panY + dy,
+        })
         return
       }
 
-      // Color picker hover preview
+      if (mode === 'moving' && layerDragStart.current && selectedLayerId) {
+        const dx = (e.clientX - layerDragStart.current.clientX) / effectiveScale
+        const dy = (e.clientY - layerDragStart.current.clientY) / effectiveScale
+        moveLayer(
+          selectedLayerId,
+          layerDragStart.current.imageX + dx,
+          layerDragStart.current.imageY + dy,
+        )
+        return
+      }
+
       if (colorPicker.active) {
         const { px, py } = toPixelCoords(e.clientX, e.clientY)
         colorPicker.onHover(px, py)
@@ -159,10 +246,12 @@ export function ImageCanvas() {
 
       if (mode === 'drawing' && drawing) {
         const { px, py } = toPixelCoords(e.clientX, e.clientY)
-        setDrawing((prev) => (prev ? { ...prev, currentX: px, currentY: py } : null))
+        setDrawing((prev) =>
+          prev ? { ...prev, currentX: px, currentY: py } : null,
+        )
       }
     },
-    [mode, drawing, toPixelCoords, colorPicker],
+    [mode, drawing, toPixelCoords, colorPicker, selectedLayerId, effectiveScale, moveLayer],
   )
 
   const handleMouseUp = useCallback(() => {
@@ -171,22 +260,53 @@ export function ImageCanvas() {
       panStart.current = null
       return
     }
+    if (mode === 'moving') {
+      // Push history snapshot after layer drag ends
+      const state = useImageStore.getState()
+      const { imageHistory, imageHistoryIndex, images: currentImages } = state
+      const truncated = imageHistory.slice(0, imageHistoryIndex + 1)
+      const next = [...truncated, { images: currentImages }]
+      if (next.length > MAX_HISTORY) next.shift()
+      useImageStore.setState({
+        imageHistory: next,
+        imageHistoryIndex: next.length - 1,
+      })
+
+      setMode('idle')
+      layerDragStart.current = null
+      return
+    }
     if (colorPicker.active) return
-    if (mode === 'drawing' && drawing && imageDimensions) {
-      const x = Math.min(drawing.startX, drawing.currentX)
-      const y = Math.min(drawing.startY, drawing.currentY)
-      const w = Math.abs(drawing.currentX - drawing.startX)
-      const h = Math.abs(drawing.currentY - drawing.startY)
-      if (w > 5 && h > 5) {
-        const rect: PixelRect = { x, y, width: w, height: h }
-        addAnnotation(rect)
+    if (mode === 'drawing' && drawing && compositeDims) {
+      if (drawingTool === 'arrow') {
+        const len = Math.hypot(
+          drawing.currentX - drawing.startX,
+          drawing.currentY - drawing.startY,
+        )
+        if (len > 10) {
+          addArrowAnnotation({
+            x1: drawing.startX,
+            y1: drawing.startY,
+            x2: drawing.currentX,
+            y2: drawing.currentY,
+          })
+        }
+      } else {
+        const x = Math.min(drawing.startX, drawing.currentX)
+        const y = Math.min(drawing.startY, drawing.currentY)
+        const w = Math.abs(drawing.currentX - drawing.startX)
+        const h = Math.abs(drawing.currentY - drawing.startY)
+        if (w > 5 && h > 5) {
+          const rect: PixelRect = { x, y, width: w, height: h }
+          addAnnotation(rect)
+        }
       }
     }
     setDrawing(null)
     setMode('idle')
-  }, [mode, drawing, addAnnotation, imageDimensions, colorPicker.active])
+  }, [mode, drawing, addAnnotation, addArrowAnnotation, drawingTool, compositeDims, colorPicker.active])
 
-  // ── Wheel: Figma-style scroll/zoom (non-passive to allow preventDefault) ──
+  // ── Wheel: Figma-style scroll/zoom ──
 
   useEffect(() => {
     const el = containerRef.current
@@ -195,7 +315,6 @@ export function ImageCanvas() {
     const onWheel = (e: WheelEvent) => {
       e.preventDefault()
 
-      // Ctrl/Cmd + scroll → zoom toward cursor
       if (e.ctrlKey || e.metaKey) {
         const delta = -e.deltaY * 0.01
         setZoom((z) => {
@@ -213,7 +332,6 @@ export function ImageCanvas() {
         return
       }
 
-      // Shift + scroll → pan horizontally; plain scroll → pan vertically
       setPan((p) => ({
         x: p.x - (e.shiftKey ? e.deltaY || e.deltaX : e.deltaX),
         y: p.y - (e.shiftKey ? 0 : e.deltaY),
@@ -228,48 +346,47 @@ export function ImageCanvas() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      // Don't intercept when typing in inputs
       const tag = (e.target as HTMLElement)?.tagName
       if (tag === 'INPUT' || tag === 'TEXTAREA') return
 
-      // Ctrl+Z / Cmd+Z → Undo
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
         e.preventDefault()
         undo()
         return
       }
-      // Ctrl+Shift+Z / Cmd+Shift+Z → Redo
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') {
         e.preventDefault()
         redo()
         return
       }
-      // Delete / Backspace → Remove selected
-      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedItemId) {
+      if (
+        (e.key === 'Delete' || e.key === 'Backspace') &&
+        selectedItemId
+      ) {
         e.preventDefault()
         removeAnnotation(selectedItemId)
         return
       }
-      // Escape → Deselect / exit color picker
       if (e.key === 'Escape') {
-        if (colorPicker.active) {
+        if (drawingTool === 'arrow') {
+          setDrawingTool('box')
+        } else if (colorPicker.active) {
           colorPicker.deactivate()
+        } else if (selectedLayerId) {
+          setSelectedLayer(null)
         } else {
           setSelected(null)
         }
         return
       }
-      // + / = → Zoom in
       if (e.key === '+' || e.key === '=') {
         setZoom((z) => Math.min(MAX_ZOOM, z + ZOOM_STEP))
         return
       }
-      // - → Zoom out
       if (e.key === '-') {
         setZoom((z) => Math.max(MIN_ZOOM, z - ZOOM_STEP))
         return
       }
-      // 0 → Reset zoom and center
       if (e.key === '0') {
         setZoom(1)
         requestAnimationFrame(() => setPan(centerPan()))
@@ -278,16 +395,31 @@ export function ImageCanvas() {
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [undo, redo, selectedItemId, removeAnnotation, setSelected, centerPan, colorPicker])
+  }, [
+    undo,
+    redo,
+    selectedItemId,
+    removeAnnotation,
+    setSelected,
+    centerPan,
+    colorPicker,
+    selectedLayerId,
+    setSelectedLayer,
+    drawingTool,
+    setDrawingTool,
+  ])
 
-  if (!image) return null
+  if (images.length === 0) return null
 
   const toDisplay = (px: number) => px * effectiveScale
-  const cursor = mode === 'panning'
-    ? 'grabbing'
-    : colorPicker.active
-      ? 'crosshair'
-      : 'crosshair'
+
+  const getCursor = () => {
+    if (mode === 'panning') return 'grabbing'
+    if (mode === 'moving') return 'grabbing'
+    if (colorPicker.active) return 'crosshair'
+    if (selectedLayerId) return 'grab'
+    return 'crosshair'
+  }
 
   return (
     <div className="flex h-full flex-col gap-2 select-none">
@@ -295,17 +427,21 @@ export function ImageCanvas() {
       <div className="flex items-center gap-2 text-xs text-zinc-400">
         <button
           type="button"
-          onClick={() => setZoom((z) => Math.max(MIN_ZOOM, z - ZOOM_STEP))}
+          onClick={() =>
+            setZoom((z) => Math.max(MIN_ZOOM, z - ZOOM_STEP))
+          }
           className="rounded border border-zinc-300 px-1.5 py-0.5 hover:bg-zinc-100 dark:border-zinc-600 dark:hover:bg-zinc-800"
         >
           −
         </button>
-        <span className="min-w-[3.5rem] text-center font-mono">
+        <span className="min-w-14 text-center font-mono">
           {Math.round(zoom * 100)}%
         </span>
         <button
           type="button"
-          onClick={() => setZoom((z) => Math.min(MAX_ZOOM, z + ZOOM_STEP))}
+          onClick={() =>
+            setZoom((z) => Math.min(MAX_ZOOM, z + ZOOM_STEP))
+          }
           className="rounded border border-zinc-300 px-1.5 py-0.5 hover:bg-zinc-100 dark:border-zinc-600 dark:hover:bg-zinc-800"
         >
           +
@@ -321,7 +457,36 @@ export function ImageCanvas() {
           Fit
         </button>
 
-        {/* Divider */}
+        <div className="mx-1 h-4 w-px bg-zinc-300 dark:bg-zinc-600" />
+
+        {/* Drawing tool selector */}
+        <div className="flex items-center gap-0.5 rounded border border-zinc-300 dark:border-zinc-600">
+          <button
+            type="button"
+            onClick={() => setDrawingTool('box')}
+            title="Box tool"
+            className={`flex items-center gap-1 rounded-l px-1.5 py-0.5 transition-colors ${
+              drawingTool === 'box'
+                ? 'bg-orange-500 text-white'
+                : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'
+            }`}
+          >
+            <Icon name="squareOutline" size={12} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setDrawingTool('arrow')}
+            title="Arrow tool"
+            className={`flex items-center gap-1 rounded-r px-1.5 py-0.5 transition-colors ${
+              drawingTool === 'arrow'
+                ? 'bg-orange-500 text-white'
+                : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'
+            }`}
+          >
+            <Icon name="arrowUpRight" size={12} />
+          </button>
+        </div>
+
         <div className="mx-1 h-4 w-px bg-zinc-300 dark:bg-zinc-600" />
 
         {/* Color picker toggle */}
@@ -355,7 +520,6 @@ export function ImageCanvas() {
           Pick Color
         </button>
 
-        {/* Hover color preview */}
         {colorPicker.active && colorPicker.hoverColor && (
           <div className="flex items-center gap-1.5">
             <div
@@ -371,7 +535,11 @@ export function ImageCanvas() {
         <span className="ml-auto text-zinc-500 dark:text-zinc-500">
           {colorPicker.active
             ? 'Click to pick color · Esc to exit'
-            : `Scroll to pan · ${/Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘' : 'Ctrl'}+scroll to zoom`}
+            : selectedLayerId
+              ? 'Drag to move layer · Esc to deselect'
+              : drawingTool === 'arrow'
+                ? 'Drag to draw arrow · Esc to switch back to box'
+                : `${/Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘V' : 'Ctrl+V'} to paste · Scroll to pan · ${/Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘' : 'Ctrl'}+scroll to zoom`}
         </span>
       </div>
 
@@ -379,13 +547,14 @@ export function ImageCanvas() {
       <div
         ref={containerRef}
         className="relative min-h-0 flex-1 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800"
-        style={{ cursor, padding: BADGE_PAD }}
+        style={{ cursor: getCursor(), padding: BADGE_PAD }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
         <div
+          className="bg-zinc-200/60 dark:bg-zinc-700/40"
           style={{
             transform: `translate(${pan.x}px, ${pan.y}px)`,
             width: displayW,
@@ -393,15 +562,59 @@ export function ImageCanvas() {
             position: 'relative',
           }}
         >
-          <img
-            src={image}
-            alt="Uploaded screenshot"
-            className="block"
-            style={{ width: displayW, height: displayH }}
-            draggable={false}
-          />
+          {/* Render each image at its position (array order = z-order, index 0 = back) */}
+          {images.map((img) => (
+            <img
+              key={img.id}
+              src={img.dataUrl}
+              alt="Uploaded image"
+              className="absolute block"
+              style={{
+                left: toDisplay(img.x),
+                top: toDisplay(img.y),
+                width: toDisplay(img.dimensions.w),
+                height: toDisplay(img.dimensions.h),
+                outline:
+                  img.id === selectedLayerId
+                    ? '2px solid #3b82f6'
+                    : undefined,
+                outlineOffset:
+                  img.id === selectedLayerId ? '-1px' : undefined,
+              }}
+              draggable={false}
+            />
+          ))}
 
-          {/* SVG overlay */}
+          {/* Image ID badges */}
+          {showImageIds &&
+            images.map((img) => {
+              const badgeSize = 24
+              const fontSize = badgeSize * 0.5
+              return (
+                <div
+                  key={`badge-${img.id}`}
+                  className="pointer-events-none absolute flex items-center justify-center"
+                  style={{
+                    left: toDisplay(img.x) + 6,
+                    top: toDisplay(img.y) + 6,
+                    width: badgeSize,
+                    height: badgeSize,
+                    borderRadius: '50%',
+                    border: '2px solid #9ca3af',
+                    backgroundColor: 'rgba(75, 85, 99, 0.7)',
+                    color: '#e5e7eb',
+                    fontSize,
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    zIndex: 1,
+                  }}
+                >
+                  {img.displayId}
+                </div>
+              )
+            })}
+
+          {/* SVG overlay for annotations */}
           <svg
             className="absolute left-0 top-0"
             style={{
@@ -412,9 +625,82 @@ export function ImageCanvas() {
             viewBox={`0 0 ${displayW} ${displayH}`}
             preserveAspectRatio="xMinYMin meet"
           >
+            <defs>
+              <marker
+                id="arrowhead"
+                markerWidth="10"
+                markerHeight="7"
+                refX="9"
+                refY="3.5"
+                orient="auto"
+                fill="#f97316"
+              >
+                <polygon points="0 0, 10 3.5, 0 7" />
+              </marker>
+              <marker
+                id="arrowhead-preview"
+                markerWidth="10"
+                markerHeight="7"
+                refX="9"
+                refY="3.5"
+                orient="auto"
+                fill="#f97316"
+              >
+                <polygon points="0 0, 10 3.5, 0 7" />
+              </marker>
+            </defs>
             {items.map((item) => {
               const isSelected = item.id === selectedItemId
               const color = '#f97316'
+
+              if (item.kind === 'arrow' && item.arrow) {
+                const ax1 = toDisplay(item.arrow.x1)
+                const ay1 = toDisplay(item.arrow.y1)
+                const ax2 = toDisplay(item.arrow.x2)
+                const ay2 = toDisplay(item.arrow.y2)
+                const badgeR = 10
+                return (
+                  <g
+                    key={item.id}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setSelected(item.id)
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <line
+                      x1={ax1}
+                      y1={ay1}
+                      x2={ax2}
+                      y2={ay2}
+                      stroke="transparent"
+                      strokeWidth={12}
+                    />
+                    <line
+                      x1={ax1}
+                      y1={ay1}
+                      x2={ax2}
+                      y2={ay2}
+                      stroke={color}
+                      strokeWidth={isSelected ? 3 : 2}
+                      markerEnd="url(#arrowhead)"
+                      className={isSelected ? 'animate-pulse' : ''}
+                    />
+                    <circle cx={ax1} cy={ay1} r={badgeR} fill={color} />
+                    <text
+                      x={ax1}
+                      y={ay1 + 4}
+                      textAnchor="middle"
+                      fontSize="11"
+                      fontWeight="bold"
+                      fill="white"
+                    >
+                      {item.index}
+                    </text>
+                  </g>
+                )
+              }
+
               const dx = toDisplay(item.rect.x)
               const dy = toDisplay(item.rect.y)
               const dw = toDisplay(item.rect.width)
@@ -442,39 +728,71 @@ export function ImageCanvas() {
                     className={isSelected ? 'animate-pulse' : ''}
                   />
                   <g>
-                    <circle cx={dx + 12} cy={dy - 2} r={10} fill={color} />
-                    <text
-                      x={dx + 12}
-                      y={dy + 2}
-                      textAnchor="middle"
-                      fontSize="11"
-                      fontWeight="bold"
-                      fill="white"
-                    >
-                      {item.index}
-                    </text>
+                    {(() => {
+                      const badgeR = 10
+                      const fitsAbove = dy - 2 - badgeR >= 0
+                      const bx = dx + 12
+                      const by = fitsAbove ? dy - 2 : dy + badgeR + 4
+                      return (
+                        <>
+                          <circle
+                            cx={bx}
+                            cy={by}
+                            r={badgeR}
+                            fill={color}
+                          />
+                          <text
+                            x={bx}
+                            y={by + 4}
+                            textAnchor="middle"
+                            fontSize="11"
+                            fontWeight="bold"
+                            fill="white"
+                          >
+                            {item.index}
+                          </text>
+                        </>
+                      )
+                    })()}
                   </g>
                 </g>
               )
             })}
 
             {/* Drawing preview */}
-            {drawing && (
+            {drawing && drawingTool === 'arrow' ? (
+              <line
+                x1={toDisplay(drawing.startX)}
+                y1={toDisplay(drawing.startY)}
+                x2={toDisplay(drawing.currentX)}
+                y2={toDisplay(drawing.currentY)}
+                stroke="#f97316"
+                strokeWidth={2}
+                strokeDasharray="6 3"
+                markerEnd="url(#arrowhead-preview)"
+              />
+            ) : drawing ? (
               <rect
                 x={toDisplay(Math.min(drawing.startX, drawing.currentX))}
                 y={toDisplay(Math.min(drawing.startY, drawing.currentY))}
-                width={toDisplay(Math.abs(drawing.currentX - drawing.startX))}
-                height={toDisplay(Math.abs(drawing.currentY - drawing.startY))}
+                width={toDisplay(
+                  Math.abs(drawing.currentX - drawing.startX),
+                )}
+                height={toDisplay(
+                  Math.abs(drawing.currentY - drawing.startY),
+                )}
                 fill="rgba(249, 115, 22, 0.1)"
                 stroke="#f97316"
                 strokeWidth={2}
                 strokeDasharray="6 3"
                 rx={3}
               />
-            )}
+            ) : null}
           </svg>
         </div>
       </div>
     </div>
   )
 }
+
+const MAX_HISTORY = 50
