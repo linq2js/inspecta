@@ -97,10 +97,23 @@ export function IdentifyTemplate() {
         handleCopyImageWithFeedback()
         return
       }
+      // Ctrl+Shift+D — download image
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'd') {
+        e.preventDefault()
+        handleDownloadWithTimestamp()
+        return
+      }
+      // Ctrl+Shift+M — toggle image meta
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'm') {
+        e.preventDefault()
+        const { includeImageMeta, setIncludeImageMeta } = useImageStore.getState()
+        setIncludeImageMeta(!includeImageMeta)
+        return
+      }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [toggleAppMode, handleCopyPrompt, handleCopyImageWithFeedback])
+  }, [toggleAppMode, handleCopyPrompt, handleCopyImageWithFeedback, handleDownloadWithTimestamp])
 
   const hasImages = images.length > 0
 
@@ -321,6 +334,7 @@ function PreviewMode({
               size="sm"
               onClick={onDownload}
               disabled={!hasPreview}
+              title="Download (Ctrl+Shift+D)"
             >
               <Icon name="download" size={14} />
               Download
@@ -331,9 +345,10 @@ function PreviewMode({
                   type="button"
                   onClick={() => setIncludeImageMeta(!includeImageMeta)}
                   title={
-                    includeImageMeta
+                    (includeImageMeta
                       ? 'Image meta ON — IDs shown on image, image list appended to prompt'
-                      : 'Image meta OFF — no IDs on image, no image list in prompt'
+                      : 'Image meta OFF — no IDs on image, no image list in prompt') +
+                    ' (Ctrl+Shift+M)'
                   }
                   className={`flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium transition-colors ${
                     includeImageMeta
