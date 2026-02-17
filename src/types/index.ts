@@ -72,7 +72,9 @@ export interface ArrowPoints {
 
 export interface DrawnAnnotation {
   id: string
-  kind: 'box' | 'arrow'
+  /** Stable display index assigned at creation time — never changes on delete */
+  displayIndex: number
+  kind: 'box' | 'arrow' | 'line' | 'blur'
   rect: PixelRect
   arrow?: ArrowPoints
   note: string
@@ -82,7 +84,7 @@ export interface UnifiedItem {
   index: number
   id: string
   type: 'annotation'
-  kind: 'box' | 'arrow'
+  kind: 'box' | 'arrow' | 'line' | 'blur'
   label: string
   rect: PixelRect
   arrow?: ArrowPoints

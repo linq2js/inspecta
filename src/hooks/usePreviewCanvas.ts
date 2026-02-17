@@ -39,7 +39,8 @@ export function usePreviewCanvas() {
         loadedCount++
 
         if (loadedCount === totalImages) {
-          if (includeImageMeta) drawImageIdBadges(ctx)
+          if (includeImageMeta && images.length > 1) drawImageIdBadges(ctx)
+          drawBlurRegions(ctx)
           drawAnnotations(ctx)
           setPreviewUrl(canvas.toDataURL('image/png'))
         }
@@ -77,11 +78,73 @@ export function usePreviewCanvas() {
     }
   }
 
+  function drawBlurRegions(ctx: CanvasRenderingContext2D) {
+    for (const item of items) {
+      if (item.kind !== 'blur') continue
+
+      const x = Math.round(item.rect.x)
+      const y = Math.round(item.rect.y)
+      const w = Math.round(item.rect.width)
+      const h = Math.round(item.rect.height)
+      if (w <= 0 || h <= 0) continue
+
+      const pixelSize = Math.max(4, Math.round(Math.min(w, h) / 8))
+      const imageData = ctx.getImageData(x, y, w, h)
+      const { data, width, height } = imageData
+
+      for (let py = 0; py < height; py += pixelSize) {
+        for (let px = 0; px < width; px += pixelSize) {
+          let r = 0, g = 0, b = 0, count = 0
+          for (let dy = 0; dy < pixelSize && py + dy < height; dy++) {
+            for (let dx = 0; dx < pixelSize && px + dx < width; dx++) {
+              const i = ((py + dy) * width + (px + dx)) * 4
+              r += data[i]
+              g += data[i + 1]
+              b += data[i + 2]
+              count++
+            }
+          }
+          r = Math.round(r / count)
+          g = Math.round(g / count)
+          b = Math.round(b / count)
+          for (let dy = 0; dy < pixelSize && py + dy < height; dy++) {
+            for (let dx = 0; dx < pixelSize && px + dx < width; dx++) {
+              const i = ((py + dy) * width + (px + dx)) * 4
+              data[i] = r
+              data[i + 1] = g
+              data[i + 2] = b
+            }
+          }
+        }
+      }
+
+      ctx.putImageData(imageData, x, y)
+
+      // Draw badge
+      const badgeRadius = 14
+      const bx = x + badgeRadius + 4
+      const fitsAbove = y - 4 - badgeRadius >= 0
+      const by = fitsAbove ? y - 4 : y + badgeRadius + 4
+      ctx.fillStyle = '#3b82f6'
+      ctx.beginPath()
+      ctx.arc(bx, by, badgeRadius, 0, Math.PI * 2)
+      ctx.fill()
+
+      ctx.fillStyle = 'white'
+      ctx.font = 'bold 14px sans-serif'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(String(item.index), bx, by)
+    }
+  }
+
   function drawAnnotations(ctx: CanvasRenderingContext2D) {
     for (const item of items) {
+      if (item.kind === 'blur') continue
+
       const color = '#f97316'
 
-      if (item.kind === 'arrow' && item.arrow) {
+      if ((item.kind === 'arrow' || item.kind === 'line') && item.arrow) {
         const { x1, y1, x2, y2 } = item.arrow
 
         // Draw line
@@ -93,22 +156,24 @@ export function usePreviewCanvas() {
         ctx.lineTo(x2, y2)
         ctx.stroke()
 
-        // Arrowhead at end point
-        const angle = Math.atan2(y2 - y1, x2 - x1)
-        const headLen = 14
-        ctx.fillStyle = color
-        ctx.beginPath()
-        ctx.moveTo(x2, y2)
-        ctx.lineTo(
-          x2 - headLen * Math.cos(angle - Math.PI / 6),
-          y2 - headLen * Math.sin(angle - Math.PI / 6),
-        )
-        ctx.lineTo(
-          x2 - headLen * Math.cos(angle + Math.PI / 6),
-          y2 - headLen * Math.sin(angle + Math.PI / 6),
-        )
-        ctx.closePath()
-        ctx.fill()
+        // Arrowhead at end point (arrow only)
+        if (item.kind === 'arrow') {
+          const angle = Math.atan2(y2 - y1, x2 - x1)
+          const headLen = 14
+          ctx.fillStyle = color
+          ctx.beginPath()
+          ctx.moveTo(x2, y2)
+          ctx.lineTo(
+            x2 - headLen * Math.cos(angle - Math.PI / 6),
+            y2 - headLen * Math.sin(angle - Math.PI / 6),
+          )
+          ctx.lineTo(
+            x2 - headLen * Math.cos(angle + Math.PI / 6),
+            y2 - headLen * Math.sin(angle + Math.PI / 6),
+          )
+          ctx.closePath()
+          ctx.fill()
+        }
 
         // Badge at start (tail) point
         const badgeRadius = 14

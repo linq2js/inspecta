@@ -32,6 +32,12 @@
   }
 }
 
+@keyframes marching-ants {
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

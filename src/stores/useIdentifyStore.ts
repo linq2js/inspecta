@@ -84,12 +84,14 @@ function buildAnnotationList(
   items: UnifiedItem[],
   dims: { w: number; h: number } | null,
 ) {
+  const visible = items.filter((i) => i.kind !== 'blur')
   const dimSuffix = dims ? ` ${dims.w}×${dims.h}px` : ''
   let lines = `Image dimensions:${dimSuffix}\n\n`
   lines += 'Annotations:\n'
-  for (const item of items) {
-    if (item.kind === 'arrow' && item.arrow) {
-      lines += `[${item.index}] arrow from (${Math.round(item.arrow.x1)},${Math.round(item.arrow.y1)}) to (${Math.round(item.arrow.x2)},${Math.round(item.arrow.y2)})\n`
+  for (const item of visible) {
+    if ((item.kind === 'arrow' || item.kind === 'line') && item.arrow) {
+      const label = item.kind === 'arrow' ? 'arrow' : 'line'
+      lines += `[${item.index}] ${label} from (${Math.round(item.arrow.x1)},${Math.round(item.arrow.y1)}) to (${Math.round(item.arrow.x2)},${Math.round(item.arrow.y2)})\n`
     } else {
       lines += `[${item.index}] at (x:${Math.round(item.rect.x)}px y:${Math.round(item.rect.y)}px w:${Math.round(item.rect.width)}px h:${Math.round(item.rect.height)}px)\n`
     }
@@ -98,7 +100,7 @@ function buildAnnotationList(
 }
 
 function buildNotes(items: UnifiedItem[]) {
-  const noted = items.filter((i) => i.note.trim())
+  const noted = items.filter((i) => i.kind !== 'blur' && i.note.trim())
   if (noted.length === 0) return ''
   let lines = '\nNotes:\n'
   for (const item of noted) {
@@ -183,32 +185,42 @@ export const useIdentifyStore = create<IdentifyState>((set, get) => ({
 
   getUnifiedList: () => {
     const { annotations } = get()
-    return annotations.map((a, i) => ({
-      index: i + 1,
+    return annotations.map((a) => ({
+      index: a.displayIndex,
       id: a.id,
       type: 'annotation' as const,
       kind: a.kind,
-      label: a.kind === 'arrow' ? 'Arrow annotation' : 'User annotation',
+      label:
+        a.kind === 'arrow'
+          ? 'Arrow annotation'
+          : a.kind === 'line'
+            ? 'Line annotation'
+            : a.kind === 'blur'
+              ? 'Blur box'
+              : 'User annotation',
       rect: a.rect,
       arrow: a.arrow,
       note: a.note,
     }))
   },
 
-  setImage: (dataUrl, dimensions) =>
-    set({
+  setImage: (dataUrl, dimensions) => {
+    annotationCounter = 0
+    return set({
       image: dataUrl,
       imageDimensions: dimensions,
       annotations: [],
       selectedItemId: null,
       history: [{ annotations: [] }],
       historyIndex: 0,
-    }),
+    })
+  },
 
   addAnnotation: (rect) => {
     annotationCounter++
     const annotation: DrawnAnnotation = {
       id: `ann-${annotationCounter}-${Date.now()}`,
+      displayIndex: annotationCounter,
       kind: 'box',
       rect,
       note: '',
@@ -252,15 +264,17 @@ export const useIdentifyStore = create<IdentifyState>((set, get) => ({
 
   setSelected: (id) => set({ selectedItemId: id }),
 
-  clearAnnotations: () =>
-    set((state) => {
+  clearAnnotations: () => {
+    annotationCounter = 0
+    return set((state) => {
       const newAnnotations: DrawnAnnotation[] = []
       return {
         annotations: newAnnotations,
         selectedItemId: null,
         ...pushHistory(state.history, state.historyIndex, newAnnotations),
       }
-    }),
+    })
+  },
 
   setExtraPrompt: (text) => set({ extraPrompt: text }),
 
@@ -286,8 +300,9 @@ export const useIdentifyStore = create<IdentifyState>((set, get) => ({
     }
   },
 
-  reset: () =>
-    set({
+  reset: () => {
+    annotationCounter = 0
+    return set({
       image: null,
       imageDimensions: null,
       annotations: [],
@@ -295,5 +310,6 @@ export const useIdentifyStore = create<IdentifyState>((set, get) => ({
       extraPrompt: '',
       history: [{ annotations: [] }],
       historyIndex: 0,
-    }),
+    })
+  },
 }))

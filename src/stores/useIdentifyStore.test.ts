@@ -196,5 +196,28 @@ describe('useIdentifyStore', () => {
       const prompt = useIdentifyStore.getState().generatePrompt()
       expect(prompt).toContain('refactor and improve')
     })
+
+    it('should exclude blur annotations from generated prompt', () => {
+      useIdentifyStore
+        .getState()
+        .addAnnotation({ x: 50, y: 100, width: 200, height: 150 })
+
+      // Manually inject a blur annotation into the store
+      const state = useIdentifyStore.getState()
+      const blurAnnotation = {
+        id: 'blur-test-1',
+        displayIndex: 2,
+        kind: 'blur' as const,
+        rect: { x: 300, y: 300, width: 100, height: 100 },
+        note: '',
+      }
+      useIdentifyStore.setState({
+        annotations: [...state.annotations, blurAnnotation],
+      })
+
+      const prompt = useIdentifyStore.getState().generatePrompt()
+      expect(prompt).toContain('[1] at (x:50px y:100px')
+      expect(prompt).not.toContain('[2]')
+    })
   })
 })

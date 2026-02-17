@@ -1,7 +1,6 @@
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useCallback } from 'react'
 import { IndexBadge } from '@/components/atoms/IndexBadge'
 import { Icon } from '@/components/atoms/Icon'
-import { NoteInput } from '@/components/molecules/NoteInput'
 import { useAnnotationStore } from '@/stores/useAnnotationStore'
 
 export function UnifiedItemList() {
@@ -16,16 +15,6 @@ export function UnifiedItemList() {
 
   const items = getUnifiedList()
   const listRef = useRef<HTMLDivElement>(null)
-
-  const [editingNoteId, setEditingNoteId] = useState<string | null>(null)
-
-  const handleDoubleClick = useCallback(
-    (id: string) => {
-      setSelected(id)
-      setEditingNoteId(id)
-    },
-    [setSelected],
-  )
 
   useEffect(() => {
     if (!selectedItemId || !listRef.current) return
@@ -56,32 +45,43 @@ export function UnifiedItemList() {
         {items.length > 0 ? (
           <div className="space-y-2">
             {items.map((item) => {
-              const hasNote = !!item.note.trim()
+              const isSelected = item.id === selectedItemId
               return (
                 <div
                   key={item.id}
                   data-item-id={item.id}
                   onClick={() => setSelected(item.id)}
-                  onDoubleClick={() => handleDoubleClick(item.id)}
                   className={`cursor-pointer rounded-lg border p-3 transition-colors ${
-                    item.id === selectedItemId
+                    isSelected
                       ? 'border-orange-400 bg-orange-50 dark:border-orange-600 dark:bg-orange-950/30'
                       : 'border-zinc-200 hover:border-zinc-300 dark:border-zinc-700 dark:hover:border-zinc-600'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <IndexBadge
-                        index={item.index}
-                        type="annotation"
-                        size="sm"
-                      />
-                      <span className="text-sm text-zinc-700 dark:text-zinc-300">
-                        {item.kind === 'arrow' ? 'Arrow' : 'Box'}
+                  <div className="flex items-center gap-2">
+                    <IndexBadge
+                      index={item.index}
+                      type="annotation"
+                      size="sm"
+                    />
+                    <div className="flex min-w-0 flex-1 items-baseline gap-1.5">
+                      <span className="shrink-0 text-sm text-zinc-700 dark:text-zinc-300">
+                        {item.kind === 'arrow'
+                          ? 'Arrow'
+                          : item.kind === 'line'
+                            ? 'Line'
+                            : item.kind === 'blur'
+                              ? 'Blur'
+                              : 'Box'}
                       </span>
-                      {!hasNote && (
-                        <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-                          No note
+                      {item.kind === 'blur' ? (
+                        <span className="rounded-full bg-blue-100 px-1.5 py-0.5 text-[10px] font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                          Hidden
+                        </span>
+                      ) : (
+                        <span className="truncate text-[10px] text-zinc-400">
+                          {(item.kind === 'arrow' || item.kind === 'line') && item.arrow
+                            ? `(${Math.round(item.arrow.x1)},${Math.round(item.arrow.y1)}) → (${Math.round(item.arrow.x2)},${Math.round(item.arrow.y2)})`
+                            : `${Math.round(item.rect.x)},${Math.round(item.rect.y)} · ${Math.round(item.rect.width)}×${Math.round(item.rect.height)}`}
                         </span>
                       )}
                     </div>
@@ -91,35 +91,23 @@ export function UnifiedItemList() {
                         e.stopPropagation()
                         removeAnnotation(item.id)
                       }}
-                      className="text-zinc-400 hover:text-red-500"
+                      className="shrink-0 text-zinc-400 hover:text-red-500"
                     >
                       <Icon name="trash" size={14} />
                     </button>
                   </div>
-                  <div className="mt-1 text-xs text-zinc-400">
-                    {item.kind === 'arrow' && item.arrow ? (
-                      <>
-                        From: ({Math.round(item.arrow.x1)},{' '}
-                        {Math.round(item.arrow.y1)}) — To: (
-                        {Math.round(item.arrow.x2)},{' '}
-                        {Math.round(item.arrow.y2)})
-                      </>
-                    ) : (
-                      <>
-                        Position: {Math.round(item.rect.x)}px,{' '}
-                        {Math.round(item.rect.y)}px · Size:{' '}
-                        {Math.round(item.rect.width)}×
-                        {Math.round(item.rect.height)}px
-                      </>
-                    )}
-                  </div>
-                  <div className="mt-2">
-                    <NoteInput
-                      value={item.note}
-                      onChange={(note) => setItemNote(item.id, note)}
-                      forceExpand={editingNoteId === item.id}
-                    />
-                  </div>
+                  {item.kind !== 'blur' && (
+                    isSelected ? (
+                      <AutoResizeTextarea
+                        value={item.note}
+                        onChange={(note) => setItemNote(item.id, note)}
+                      />
+                    ) : item.note.trim() ? (
+                      <div className="mt-1 whitespace-pre-wrap text-[10px] text-zinc-500 italic dark:text-zinc-400">
+                        {item.note}
+                      </div>
+                    ) : null
+                  )}
                 </div>
               )
             })}
@@ -131,5 +119,42 @@ export function UnifiedItemList() {
         )}
       </div>
     </div>
+  )
+}
+
+function AutoResizeTextarea({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (value: string) => void
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null)
+
+  const resize = useCallback(() => {
+    const el = ref.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${el.scrollHeight}px`
+  }, [])
+
+  useEffect(() => {
+    resize()
+  }, [value, resize])
+
+  return (
+    <textarea
+      ref={ref}
+      value={value}
+      onChange={(e) => {
+        onChange(e.target.value)
+        resize()
+      }}
+      onClick={(e) => e.stopPropagation()}
+      onKeyDown={(e) => e.stopPropagation()}
+      placeholder="Add note…"
+      rows={1}
+      className="mt-1.5 w-full resize-none overflow-hidden rounded border border-zinc-300 bg-transparent px-1.5 py-0.5 text-[11px] text-zinc-600 placeholder:text-zinc-400 focus:border-orange-400 focus:outline-none dark:border-zinc-600 dark:text-zinc-300 dark:placeholder:text-zinc-500 dark:focus:border-orange-500"
+    />
   )
 }

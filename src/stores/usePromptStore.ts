@@ -46,15 +46,17 @@ export function buildAnnotationBlock(
   compositeDims: { w: number; h: number } | null,
   options?: { skipDimensions?: boolean },
 ): string {
-  if (items.length === 0) return ''
+  const visible = items.filter((item) => item.kind !== 'blur')
+  if (visible.length === 0) return ''
 
   let lines = '\n## Annotations\n\n'
   if (!options?.skipDimensions && compositeDims) {
     lines += `Image dimensions: ${Math.round(compositeDims.w)}×${Math.round(compositeDims.h)}px\n\n`
   }
-  for (const item of items) {
-    if (item.kind === 'arrow' && item.arrow) {
-      lines += `- **[${item.index}]** arrow from (${Math.round(item.arrow.x1)},${Math.round(item.arrow.y1)}) to (${Math.round(item.arrow.x2)},${Math.round(item.arrow.y2)})`
+  for (const item of visible) {
+    if ((item.kind === 'arrow' || item.kind === 'line') && item.arrow) {
+      const label = item.kind === 'arrow' ? 'arrow' : 'line'
+      lines += `- **[${item.index}]** ${label} from (${Math.round(item.arrow.x1)},${Math.round(item.arrow.y1)}) to (${Math.round(item.arrow.x2)},${Math.round(item.arrow.y2)})`
     } else {
       lines += `- **[${item.index}]** at (x:${Math.round(item.rect.x)}px y:${Math.round(item.rect.y)}px w:${Math.round(item.rect.width)}px h:${Math.round(item.rect.height)}px)`
     }

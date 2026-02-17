@@ -18,10 +18,12 @@ function pushHistory(
   return { history: next, historyIndex: next.length - 1 }
 }
 
+export type DrawingTool = 'box' | 'arrow' | 'line' | 'blur'
+
 interface AnnotationState {
   annotations: DrawnAnnotation[]
   selectedItemId: string | null
-  drawingTool: 'box' | 'arrow'
+  drawingTool: DrawingTool
 
   history: AnnotationHistorySnapshot[]
   historyIndex: number
@@ -34,11 +36,13 @@ interface AnnotationState {
   getUnifiedList: () => UnifiedItem[]
   addAnnotation: (rect: PixelRect) => void
   addArrowAnnotation: (arrow: ArrowPoints) => void
+  addLineAnnotation: (arrow: ArrowPoints) => void
+  addBlurAnnotation: (rect: PixelRect) => void
   removeAnnotation: (id: string) => void
   updateAnnotationRect: (id: string, rect: PixelRect) => void
   setItemNote: (id: string, note: string) => void
   setSelected: (id: string | null) => void
-  setDrawingTool: (tool: 'box' | 'arrow') => void
+  setDrawingTool: (tool: DrawingTool) => void
   clearAnnotations: () => void
   resetAnnotations: () => void
 }
@@ -79,12 +83,19 @@ export const useAnnotationStore = create<AnnotationState>((set, get) => ({
 
   getUnifiedList: () => {
     const { annotations } = get()
-    return annotations.map((a, i) => ({
-      index: i + 1,
+    return annotations.map((a) => ({
+      index: a.displayIndex,
       id: a.id,
       type: 'annotation' as const,
       kind: a.kind,
-      label: a.kind === 'arrow' ? 'Arrow annotation' : 'User annotation',
+      label:
+        a.kind === 'arrow'
+          ? 'Arrow annotation'
+          : a.kind === 'line'
+            ? 'Line annotation'
+            : a.kind === 'blur'
+              ? 'Blur box'
+              : 'User annotation',
       rect: a.rect,
       arrow: a.arrow,
       note: a.note,
@@ -95,6 +106,7 @@ export const useAnnotationStore = create<AnnotationState>((set, get) => ({
     annotationCounter++
     const annotation: DrawnAnnotation = {
       id: `ann-${annotationCounter}-${Date.now()}`,
+      displayIndex: annotationCounter,
       kind: 'box',
       rect,
       note: '',
@@ -118,9 +130,53 @@ export const useAnnotationStore = create<AnnotationState>((set, get) => ({
     }
     const annotation: DrawnAnnotation = {
       id: `ann-${annotationCounter}-${Date.now()}`,
+      displayIndex: annotationCounter,
       kind: 'arrow',
       rect,
       arrow,
+      note: '',
+    }
+    set((state) => {
+      const newAnnotations = [...state.annotations, annotation]
+      return {
+        annotations: newAnnotations,
+        ...pushHistory(state.history, state.historyIndex, newAnnotations),
+      }
+    })
+  },
+
+  addLineAnnotation: (arrow) => {
+    annotationCounter++
+    const rect: PixelRect = {
+      x: Math.min(arrow.x1, arrow.x2),
+      y: Math.min(arrow.y1, arrow.y2),
+      width: Math.abs(arrow.x2 - arrow.x1),
+      height: Math.abs(arrow.y2 - arrow.y1),
+    }
+    const annotation: DrawnAnnotation = {
+      id: `ann-${annotationCounter}-${Date.now()}`,
+      displayIndex: annotationCounter,
+      kind: 'line',
+      rect,
+      arrow,
+      note: '',
+    }
+    set((state) => {
+      const newAnnotations = [...state.annotations, annotation]
+      return {
+        annotations: newAnnotations,
+        ...pushHistory(state.history, state.historyIndex, newAnnotations),
+      }
+    })
+  },
+
+  addBlurAnnotation: (rect) => {
+    annotationCounter++
+    const annotation: DrawnAnnotation = {
+      id: `ann-${annotationCounter}-${Date.now()}`,
+      displayIndex: annotationCounter,
+      kind: 'blur',
+      rect,
       note: '',
     }
     set((state) => {
@@ -165,21 +221,25 @@ export const useAnnotationStore = create<AnnotationState>((set, get) => ({
 
   setDrawingTool: (tool) => set({ drawingTool: tool }),
 
-  clearAnnotations: () =>
-    set((state) => {
+  clearAnnotations: () => {
+    annotationCounter = 0
+    return set((state) => {
       const newAnnotations: DrawnAnnotation[] = []
       return {
         annotations: newAnnotations,
         selectedItemId: null,
         ...pushHistory(state.history, state.historyIndex, newAnnotations),
       }
-    }),
+    })
+  },
 
-  resetAnnotations: () =>
-    set({
+  resetAnnotations: () => {
+    annotationCounter = 0
+    return set({
       annotations: [],
       selectedItemId: null,
       history: [{ annotations: [] }],
       historyIndex: 0,
-    }),
+    })
+  },
 }))

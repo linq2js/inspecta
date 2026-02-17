@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { IndexBadge } from '@/components/atoms/IndexBadge'
 import { Icon } from '@/components/atoms/Icon'
 import { useImageStore } from '@/stores/useImageStore'
 
@@ -84,21 +85,23 @@ export function LayerList() {
               Deselect
             </button>
           )}
-          <button
-            type="button"
-            onClick={() => setShowImageIds(!showImageIds)}
-            title={showImageIds ? 'Hide image IDs' : 'Show image IDs'}
-            className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
-              showImageIds
-                ? 'bg-zinc-600 text-zinc-200'
-                : 'bg-zinc-200 text-zinc-500 dark:bg-zinc-700 dark:text-zinc-400'
-            }`}
-          >
-            <span className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-current text-[8px] font-bold leading-none">
-              #
-            </span>
-            IDs
-          </button>
+          {images.length > 1 && (
+            <button
+              type="button"
+              onClick={() => setShowImageIds(!showImageIds)}
+              title={showImageIds ? 'Hide image IDs' : 'Show image IDs'}
+              className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
+                showImageIds
+                  ? 'bg-zinc-600 text-zinc-200'
+                  : 'bg-zinc-200 text-zinc-500 dark:bg-zinc-700 dark:text-zinc-400'
+              }`}
+            >
+              <span className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-current text-[8px] font-bold leading-none">
+                #
+              </span>
+              IDs
+            </button>
+          )}
         </div>
       </div>
 
@@ -155,11 +158,9 @@ export function LayerList() {
                   />
                 </div>
 
-                {/* Label + info */}
+                {/* Badge + info */}
+                <IndexBadge index={img.displayId} type="image" size="sm" />
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm text-zinc-700 dark:text-zinc-300">
-                    Image {img.displayId}
-                  </div>
                   <div className="text-[10px] text-zinc-400">
                     {img.dimensions.w}×{img.dimensions.h}px
                   </div>

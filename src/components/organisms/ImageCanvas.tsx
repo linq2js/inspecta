@@ -3,6 +3,7 @@ import { useImageStore } from '@/stores/useImageStore'
 import { useAnnotationStore } from '@/stores/useAnnotationStore'
 import { useColorPicker } from '@/hooks/useColorPicker'
 import { Icon } from '@/components/atoms/Icon'
+import { snapToAxis } from '@/lib/snap'
 import type { PixelRect } from '@/types'
 
 const BADGE_PAD = 14
@@ -21,6 +22,8 @@ export function ImageCanvas() {
     setSelected,
     addAnnotation,
     addArrowAnnotation,
+    addLineAnnotation,
+    addBlurAnnotation,
     removeAnnotation,
     drawingTool,
     setDrawingTool,
@@ -56,6 +59,7 @@ export function ImageCanvas() {
     currentX: number
     currentY: number
   } | null>(null)
+  const [shiftHeld, setShiftHeld] = useState(false)
   const panStart = useRef<{
     x: number
     y: number
@@ -245,6 +249,7 @@ export function ImageCanvas() {
       }
 
       if (mode === 'drawing' && drawing) {
+        setShiftHeld(e.shiftKey)
         const { px, py } = toPixelCoords(e.clientX, e.clientY)
         setDrawing((prev) =>
           prev ? { ...prev, currentX: px, currentY: py } : null,
@@ -254,7 +259,7 @@ export function ImageCanvas() {
     [mode, drawing, toPixelCoords, colorPicker, selectedLayerId, effectiveScale, moveLayer],
   )
 
-  const handleMouseUp = useCallback(() => {
+  const handleMouseUp = useCallback((e?: React.MouseEvent) => {
     if (mode === 'panning') {
       setMode('idle')
       panStart.current = null
@@ -278,18 +283,28 @@ export function ImageCanvas() {
     }
     if (colorPicker.active) return
     if (mode === 'drawing' && drawing && compositeDims) {
-      if (drawingTool === 'arrow') {
-        const len = Math.hypot(
-          drawing.currentX - drawing.startX,
-          drawing.currentY - drawing.startY,
-        )
+      const isShift = e?.shiftKey ?? shiftHeld
+      if (drawingTool === 'arrow' || drawingTool === 'line') {
+        let endX = drawing.currentX
+        let endY = drawing.currentY
+        if (isShift) {
+          const snapped = snapToAxis(drawing.startX, drawing.startY, endX, endY)
+          endX = snapped.x
+          endY = snapped.y
+        }
+        const len = Math.hypot(endX - drawing.startX, endY - drawing.startY)
         if (len > 10) {
-          addArrowAnnotation({
+          const points = {
             x1: drawing.startX,
             y1: drawing.startY,
-            x2: drawing.currentX,
-            y2: drawing.currentY,
-          })
+            x2: endX,
+            y2: endY,
+          }
+          if (drawingTool === 'arrow') {
+            addArrowAnnotation(points)
+          } else {
+            addLineAnnotation(points)
+          }
         }
       } else {
         const x = Math.min(drawing.startX, drawing.currentX)
@@ -298,13 +313,18 @@ export function ImageCanvas() {
         const h = Math.abs(drawing.currentY - drawing.startY)
         if (w > 5 && h > 5) {
           const rect: PixelRect = { x, y, width: w, height: h }
-          addAnnotation(rect)
+          if (drawingTool === 'blur') {
+            addBlurAnnotation(rect)
+          } else {
+            addAnnotation(rect)
+          }
         }
       }
     }
     setDrawing(null)
+    setShiftHeld(false)
     setMode('idle')
-  }, [mode, drawing, addAnnotation, addArrowAnnotation, drawingTool, compositeDims, colorPicker.active])
+  }, [mode, drawing, addAnnotation, addArrowAnnotation, addLineAnnotation, addBlurAnnotation, drawingTool, compositeDims, colorPicker.active, shiftHeld])
 
   // ── Wheel: Figma-style scroll/zoom ──
 
@@ -368,7 +388,11 @@ export function ImageCanvas() {
         return
       }
       if (e.key === 'Escape') {
-        if (drawingTool === 'arrow') {
+        if (drawingTool === 'blur') {
+          setDrawingTool('box')
+        } else if (drawingTool === 'line') {
+          setDrawingTool('box')
+        } else if (drawingTool === 'arrow') {
           setDrawingTool('box')
         } else if (colorPicker.active) {
           colorPicker.deactivate()
@@ -430,7 +454,7 @@ export function ImageCanvas() {
           onClick={() =>
             setZoom((z) => Math.max(MIN_ZOOM, z - ZOOM_STEP))
           }
-          className="rounded border border-zinc-300 px-1.5 py-0.5 hover:bg-zinc-100 dark:border-zinc-600 dark:hover:bg-zinc-800"
+          className="flex h-6 items-center justify-center rounded border border-zinc-300 px-1.5 hover:bg-zinc-100 dark:border-zinc-600 dark:hover:bg-zinc-800"
         >
           −
         </button>
@@ -442,7 +466,7 @@ export function ImageCanvas() {
           onClick={() =>
             setZoom((z) => Math.min(MAX_ZOOM, z + ZOOM_STEP))
           }
-          className="rounded border border-zinc-300 px-1.5 py-0.5 hover:bg-zinc-100 dark:border-zinc-600 dark:hover:bg-zinc-800"
+          className="flex h-6 items-center justify-center rounded border border-zinc-300 px-1.5 hover:bg-zinc-100 dark:border-zinc-600 dark:hover:bg-zinc-800"
         >
           +
         </button>
@@ -452,7 +476,7 @@ export function ImageCanvas() {
             setZoom(1)
             requestAnimationFrame(() => setPan(centerPan()))
           }}
-          className="rounded border border-zinc-300 px-1.5 py-0.5 hover:bg-zinc-100 dark:border-zinc-600 dark:hover:bg-zinc-800"
+          className="flex h-6 items-center justify-center rounded border border-zinc-300 px-1.5 hover:bg-zinc-100 dark:border-zinc-600 dark:hover:bg-zinc-800"
         >
           Fit
         </button>
@@ -465,25 +489,49 @@ export function ImageCanvas() {
             type="button"
             onClick={() => setDrawingTool('box')}
             title="Box tool"
-            className={`flex items-center gap-1 rounded-l px-1.5 py-0.5 transition-colors ${
+            className={`flex h-6 items-center justify-center rounded-l px-1.5 transition-colors ${
               drawingTool === 'box'
                 ? 'bg-orange-500 text-white'
                 : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'
             }`}
           >
-            <Icon name="squareOutline" size={12} />
+            <Icon name="squareOutline" size={14} />
           </button>
           <button
             type="button"
             onClick={() => setDrawingTool('arrow')}
             title="Arrow tool"
-            className={`flex items-center gap-1 rounded-r px-1.5 py-0.5 transition-colors ${
+            className={`flex h-6 items-center justify-center px-1.5 transition-colors ${
               drawingTool === 'arrow'
                 ? 'bg-orange-500 text-white'
                 : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'
             }`}
           >
-            <Icon name="arrowUpRight" size={12} />
+            <Icon name="arrowUpRight" size={14} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setDrawingTool('line')}
+            title="Line tool — hold Shift to snap"
+            className={`flex h-6 items-center justify-center px-1.5 transition-colors ${
+              drawingTool === 'line'
+                ? 'bg-orange-500 text-white'
+                : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'
+            }`}
+          >
+            <Icon name="lineSegment" size={14} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setDrawingTool('blur')}
+            title="Blur box tool — hide sensitive data"
+            className={`flex h-6 items-center justify-center rounded-r px-1.5 transition-colors ${
+              drawingTool === 'blur'
+                ? 'bg-blue-500 text-white'
+                : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'
+            }`}
+          >
+            <Icon name="eyeSlash" size={14} />
           </button>
         </div>
 
@@ -538,8 +586,12 @@ export function ImageCanvas() {
             : selectedLayerId
               ? 'Drag to move layer · Esc to deselect'
               : drawingTool === 'arrow'
-                ? 'Drag to draw arrow · Esc to switch back to box'
-                : `${/Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘V' : 'Ctrl+V'} to paste · Scroll to pan · ${/Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘' : 'Ctrl'}+scroll to zoom`}
+                ? 'Drag to draw arrow · Shift to snap · Esc to switch back to box'
+                : drawingTool === 'line'
+                  ? 'Drag to draw line · Shift to snap · Esc to switch back to box'
+                  : drawingTool === 'blur'
+                    ? 'Drag to draw blur box · Esc to switch back to box'
+                  : `${/Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘V' : 'Ctrl+V'} to paste · Scroll to pan · ${/Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘' : 'Ctrl'}+scroll to zoom`}
         </span>
       </div>
 
@@ -585,8 +637,9 @@ export function ImageCanvas() {
             />
           ))}
 
-          {/* Image ID badges */}
+          {/* Image ID badges — hidden when only 1 image */}
           {showImageIds &&
+            images.length > 1 &&
             images.map((img) => {
               const badgeSize = 24
               const fontSize = badgeSize * 0.5
@@ -614,6 +667,65 @@ export function ImageCanvas() {
               )
             })}
 
+          {/* Blur box overlays — rendered as DOM elements for backdrop-filter */}
+          {items
+            .filter((item) => item.kind === 'blur')
+            .map((item) => {
+              const dx = toDisplay(item.rect.x)
+              const dy = toDisplay(item.rect.y)
+              const badgeSize = 20
+              const fitsAbove = dy - 2 - badgeSize / 2 >= 0
+              const badgeLeft = dx + 12 - badgeSize / 2
+              const badgeTop = fitsAbove
+                ? dy - 2 - badgeSize / 2
+                : dy + badgeSize / 2 + 4 - badgeSize / 2
+              return (
+                <div key={`blur-${item.id}`}>
+                  {/* Blur overlay */}
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setSelected(item.id)
+                    }}
+                    className="absolute cursor-pointer"
+                    style={{
+                      left: toDisplay(item.rect.x),
+                      top: toDisplay(item.rect.y),
+                      width: toDisplay(item.rect.width),
+                      height: toDisplay(item.rect.height),
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                      backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                      borderWidth: 2,
+                      borderStyle: 'dashed',
+                      borderColor: '#3b82f6',
+                      backgroundClip: 'padding-box',
+                      borderRadius: 3,
+                      zIndex: 1,
+                    }}
+                  />
+                  {/* Badge — rendered above blur overlay */}
+                  <div
+                    className="pointer-events-none absolute flex items-center justify-center rounded-full"
+                    style={{
+                      left: badgeLeft,
+                      top: badgeTop,
+                      width: badgeSize,
+                      height: badgeSize,
+                      backgroundColor: '#3b82f6',
+                      color: 'white',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      zIndex: 3,
+                    }}
+                  >
+                    {item.index}
+                  </div>
+                </div>
+              )
+            })}
+
           {/* SVG overlay for annotations */}
           <svg
             className="absolute left-0 top-0"
@@ -621,6 +733,7 @@ export function ImageCanvas() {
               width: displayW,
               height: displayH,
               overflow: 'visible',
+              zIndex: 2,
             }}
             viewBox={`0 0 ${displayW} ${displayH}`}
             preserveAspectRatio="xMinYMin meet"
@@ -649,11 +762,11 @@ export function ImageCanvas() {
                 <polygon points="0 0, 10 3.5, 0 7" />
               </marker>
             </defs>
-            {items.map((item) => {
+            {items.filter((item) => item.kind !== 'blur').map((item) => {
               const isSelected = item.id === selectedItemId
               const color = '#f97316'
 
-              if (item.kind === 'arrow' && item.arrow) {
+              if ((item.kind === 'arrow' || item.kind === 'line') && item.arrow) {
                 const ax1 = toDisplay(item.arrow.x1)
                 const ay1 = toDisplay(item.arrow.y1)
                 const ax2 = toDisplay(item.arrow.x2)
@@ -683,8 +796,9 @@ export function ImageCanvas() {
                       y2={ay2}
                       stroke={color}
                       strokeWidth={isSelected ? 3 : 2}
-                      markerEnd="url(#arrowhead)"
-                      className={isSelected ? 'animate-pulse' : ''}
+                      strokeDasharray={isSelected ? '6 3' : undefined}
+                      markerEnd={item.kind === 'arrow' ? 'url(#arrowhead)' : undefined}
+                      style={isSelected ? { animation: 'marching-ants 0.4s linear infinite' } : undefined}
                     />
                     <circle cx={ax1} cy={ay1} r={badgeR} fill={color} />
                     <text
@@ -725,7 +839,7 @@ export function ImageCanvas() {
                     strokeWidth={isSelected ? 3 : 2}
                     strokeDasharray="6 3"
                     rx={3}
-                    className={isSelected ? 'animate-pulse' : ''}
+                    style={isSelected ? { animation: 'marching-ants 0.4s linear infinite' } : undefined}
                   />
                   <g>
                     {(() => {
@@ -759,17 +873,64 @@ export function ImageCanvas() {
               )
             })}
 
+            {/* Marching-ants selection border for blur boxes */}
+            {items
+              .filter((item) => item.kind === 'blur' && item.id === selectedItemId)
+              .map((item) => (
+                <rect
+                  key={`blur-sel-${item.id}`}
+                  x={toDisplay(item.rect.x)}
+                  y={toDisplay(item.rect.y)}
+                  width={toDisplay(item.rect.width)}
+                  height={toDisplay(item.rect.height)}
+                  fill="none"
+                  stroke="#3b82f6"
+                  strokeWidth={3}
+                  strokeDasharray="6 3"
+                  rx={3}
+                  style={{ animation: 'marching-ants 0.4s linear infinite' }}
+                  pointerEvents="none"
+                />
+              ))}
+
             {/* Drawing preview */}
-            {drawing && drawingTool === 'arrow' ? (
-              <line
-                x1={toDisplay(drawing.startX)}
-                y1={toDisplay(drawing.startY)}
-                x2={toDisplay(drawing.currentX)}
-                y2={toDisplay(drawing.currentY)}
-                stroke="#f97316"
+            {drawing && (drawingTool === 'arrow' || drawingTool === 'line') ? (
+              (() => {
+                let ex = drawing.currentX
+                let ey = drawing.currentY
+                if (shiftHeld) {
+                  const snapped = snapToAxis(drawing.startX, drawing.startY, ex, ey)
+                  ex = snapped.x
+                  ey = snapped.y
+                }
+                return (
+                  <line
+                    x1={toDisplay(drawing.startX)}
+                    y1={toDisplay(drawing.startY)}
+                    x2={toDisplay(ex)}
+                    y2={toDisplay(ey)}
+                    stroke="#f97316"
+                    strokeWidth={2}
+                    strokeDasharray="6 3"
+                    markerEnd={drawingTool === 'arrow' ? 'url(#arrowhead-preview)' : undefined}
+                  />
+                )
+              })()
+            ) : drawing && drawingTool === 'blur' ? (
+              <rect
+                x={toDisplay(Math.min(drawing.startX, drawing.currentX))}
+                y={toDisplay(Math.min(drawing.startY, drawing.currentY))}
+                width={toDisplay(
+                  Math.abs(drawing.currentX - drawing.startX),
+                )}
+                height={toDisplay(
+                  Math.abs(drawing.currentY - drawing.startY),
+                )}
+                fill="rgba(59, 130, 246, 0.15)"
+                stroke="#3b82f6"
                 strokeWidth={2}
                 strokeDasharray="6 3"
-                markerEnd="url(#arrowhead-preview)"
+                rx={3}
               />
             ) : drawing ? (
               <rect

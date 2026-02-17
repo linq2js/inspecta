@@ -38,16 +38,20 @@ export function IdentifyTemplate() {
 
   const [libraryOpen, setLibraryOpen] = useState(false)
 
-  const handleCopyPrompt = async () => {
+  const handleCopyPrompt = useCallback(async () => {
     const items = getUnifiedList()
-    const { includeImageMeta } = useImageStore.getState()
+    const { includeImageMeta, images: storeImages } = useImageStore.getState()
+    const isSingle = storeImages.length === 1
+    const effectiveMeta = isSingle
+      ? storeImages[0].note.trim().length > 0 && includeImageMeta
+      : includeImageMeta
     const compositeDims =
       canvasBounds.totalWidth > 0
         ? { w: canvasBounds.totalWidth, h: canvasBounds.totalHeight }
         : null
-    const annotationBlock = buildAnnotationBlock(items, compositeDims, { skipDimensions: includeImageMeta })
-    const imageMetaBlock = includeImageMeta
-      ? buildImageMetaBlock(images, compositeDims)
+    const annotationBlock = buildAnnotationBlock(items, compositeDims, { skipDimensions: effectiveMeta })
+    const imageMetaBlock = effectiveMeta
+      ? buildImageMetaBlock(storeImages, compositeDims)
       : ''
     const fullPrompt = markdownContent.trim()
       ? markdownContent + imageMetaBlock + annotationBlock
@@ -55,16 +59,16 @@ export function IdentifyTemplate() {
     if (!fullPrompt.trim()) return
     await navigator.clipboard.writeText(fullPrompt)
     addToast({ message: 'Prompt copied to clipboard' })
-  }
+  }, [getUnifiedList, canvasBounds, images, markdownContent, addToast])
 
-  const handleCopyImageWithFeedback = async () => {
+  const handleCopyImageWithFeedback = useCallback(async () => {
     await handleCopyImage()
     addToast({ message: 'Image copied to clipboard' })
-  }
+  }, [handleCopyImage, addToast])
 
-  const handleDownloadWithTimestamp = () => {
+  const handleDownloadWithTimestamp = useCallback(() => {
     handleDownload(getFilename())
-  }
+  }, [handleDownload, getFilename])
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -81,10 +85,22 @@ export function IdentifyTemplate() {
         setLibraryOpen((prev) => !prev)
         return
       }
+      // Ctrl+Shift+C — copy prompt
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'c') {
+        e.preventDefault()
+        handleCopyPrompt()
+        return
+      }
+      // Ctrl+Shift+X — copy image
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'x') {
+        e.preventDefault()
+        handleCopyImageWithFeedback()
+        return
+      }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [toggleAppMode])
+  }, [toggleAppMode, handleCopyPrompt, handleCopyImageWithFeedback])
 
   const hasImages = images.length > 0
 
@@ -232,13 +248,20 @@ function PreviewMode({
     useImageStore()
   const items = getUnifiedList()
 
+  // Single image: show toggler only when the image has a note; force false when no note
+  const isSingleImage = images.length === 1
+  const singleImageHasNote = isSingleImage && images[0].note.trim().length > 0
+  const effectiveImageMeta = isSingleImage
+    ? singleImageHasNote && includeImageMeta
+    : includeImageMeta
+
   // Build the full output prompt: user markdown + optional image meta + annotation block
   const compositeDims =
     canvasBounds.totalWidth > 0
       ? { w: canvasBounds.totalWidth, h: canvasBounds.totalHeight }
       : null
-  const annotationBlock = buildAnnotationBlock(items, compositeDims, { skipDimensions: includeImageMeta })
-  const imageMetaBlock = includeImageMeta
+  const annotationBlock = buildAnnotationBlock(items, compositeDims, { skipDimensions: effectiveImageMeta })
+  const imageMetaBlock = effectiveImageMeta
     ? buildImageMetaBlock(images, compositeDims)
     : ''
   const fullPrompt = markdownContent.trim()
@@ -254,6 +277,7 @@ function PreviewMode({
           size="sm"
           onClick={onCopyPrompt}
           disabled={!fullPrompt.trim()}
+          title="Copy Prompt (Ctrl+Shift+C)"
         >
           <Icon name="clipboard" size={14} />
           Copy Prompt
@@ -287,6 +311,7 @@ function PreviewMode({
               size="sm"
               onClick={onCopyImage}
               disabled={!hasPreview}
+              title="Copy Image (Ctrl+Shift+X)"
             >
               <Icon name="clipboard" size={14} />
               Copy Image
@@ -300,38 +325,40 @@ function PreviewMode({
               <Icon name="download" size={14} />
               Download
             </Button>
-            <div className="ml-auto">
-              <button
-                type="button"
-                onClick={() => setIncludeImageMeta(!includeImageMeta)}
-                title={
-                  includeImageMeta
-                    ? 'Image meta ON — IDs shown on image, image list appended to prompt'
-                    : 'Image meta OFF — no IDs on image, no image list in prompt'
-                }
-                className={`flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium transition-colors ${
-                  includeImageMeta
-                    ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-500 dark:bg-blue-950/40 dark:text-blue-300'
-                    : 'border-zinc-300 text-zinc-500 hover:border-zinc-400 dark:border-zinc-600 dark:text-zinc-400 dark:hover:border-zinc-500'
-                }`}
-              >
-                <svg
-                  width={14}
-                  height={14}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+            {(!isSingleImage || singleImageHasNote) && (
+              <div className="ml-auto">
+                <button
+                  type="button"
+                  onClick={() => setIncludeImageMeta(!includeImageMeta)}
+                  title={
+                    includeImageMeta
+                      ? 'Image meta ON — IDs shown on image, image list appended to prompt'
+                      : 'Image meta OFF — no IDs on image, no image list in prompt'
+                  }
+                  className={`flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium transition-colors ${
+                    includeImageMeta
+                      ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-500 dark:bg-blue-950/40 dark:text-blue-300'
+                      : 'border-zinc-300 text-zinc-500 hover:border-zinc-400 dark:border-zinc-600 dark:text-zinc-400 dark:hover:border-zinc-500'
+                  }`}
                 >
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <path d="M21 15l-5-5L5 21" />
-                </svg>
-                Image Meta
-              </button>
-            </div>
+                  <svg
+                    width={14}
+                    height={14}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <path d="M21 15l-5-5L5 21" />
+                  </svg>
+                  Image Meta
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>
