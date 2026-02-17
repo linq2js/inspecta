@@ -34,8 +34,10 @@ export function UnifiedItemList() {
           <button
             type="button"
             onClick={clearAnnotations}
-            className="text-xs text-zinc-400 transition-colors hover:text-red-500"
+            title="Clear all annotations"
+            className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-red-500 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-red-400"
           >
+            <Icon name="trash" size={10} />
             Clear all
           </button>
         )}
