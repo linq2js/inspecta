@@ -64,7 +64,7 @@ export function HomeTemplate({
   }, [query, platforms, category])
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+    <div className="px-3 py-4">
       {/* Hero */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-3xl">
