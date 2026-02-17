@@ -41,9 +41,10 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    @apply bg-white dark:bg-zinc-950;
   }
 
   body {
-    @apply bg-white text-zinc-900 antialiased;
+    @apply bg-white text-zinc-900 antialiased dark:bg-zinc-950;
   }
 }
