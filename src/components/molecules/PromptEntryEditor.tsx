@@ -133,7 +133,7 @@ export function PromptEntryEditor({
       </div>
 
       {/* Tags */}
-      <div>
+      <div className="mt-4">
         <label className="mb-1 block text-xs font-medium text-zinc-600 dark:text-zinc-400">
           Tags
         </label>
