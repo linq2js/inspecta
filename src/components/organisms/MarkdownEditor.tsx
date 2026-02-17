@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect } from 'react'
+import { useRef, useCallback } from 'react'
 import { usePromptStore } from '@/stores/usePromptStore'
 
 interface ToolbarAction {

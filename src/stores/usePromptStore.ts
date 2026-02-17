@@ -15,7 +15,7 @@ interface PromptState {
   resetPrompt: () => void
 }
 
-export const usePromptStore = create<PromptState>((set, get) => ({
+export const usePromptStore = create<PromptState>((set) => ({
   markdownContent: '',
   appMode: 'edit',
   showPreview: false,
