@@ -101,6 +101,7 @@ export function UnifiedItemList() {
                       <AutoResizeTextarea
                         value={item.note}
                         onChange={(note) => setItemNote(item.id, note)}
+                        autoFocus
                       />
                     ) : item.note.trim() ? (
                       <div className="mt-1 whitespace-pre-wrap text-[10px] text-zinc-500 italic dark:text-zinc-400">
@@ -125,9 +126,11 @@ export function UnifiedItemList() {
 function AutoResizeTextarea({
   value,
   onChange,
+  autoFocus = false,
 }: {
   value: string
   onChange: (value: string) => void
+  autoFocus?: boolean
 }) {
   const ref = useRef<HTMLTextAreaElement>(null)
 
@@ -141,6 +144,12 @@ function AutoResizeTextarea({
   useEffect(() => {
     resize()
   }, [value, resize])
+
+  useEffect(() => {
+    if (autoFocus && ref.current) {
+      ref.current.focus()
+    }
+  }, [autoFocus])
 
   return (
     <textarea

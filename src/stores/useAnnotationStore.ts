@@ -40,6 +40,10 @@ interface AnnotationState {
   addBlurAnnotation: (rect: PixelRect) => void
   removeAnnotation: (id: string) => void
   updateAnnotationRect: (id: string, rect: PixelRect) => void
+  /** Move an annotation by delta (works for all shape kinds) */
+  moveAnnotation: (id: string, dx: number, dy: number) => void
+  /** Snapshot current state into undo history (call after drag ends) */
+  pushMoveHistory: () => void
   setItemNote: (id: string, note: string) => void
   setSelected: (id: string | null) => void
   setDrawingTool: (tool: DrawingTool) => void
@@ -209,6 +213,32 @@ export const useAnnotationStore = create<AnnotationState>((set, get) => ({
         ...pushHistory(state.history, state.historyIndex, newAnnotations),
       }
     }),
+
+  moveAnnotation: (id, dx, dy) =>
+    set((state) => ({
+      annotations: state.annotations.map((a) => {
+        if (a.id !== id) return a
+        const movedRect = {
+          ...a.rect,
+          x: a.rect.x + dx,
+          y: a.rect.y + dy,
+        }
+        const movedArrow = a.arrow
+          ? {
+              x1: a.arrow.x1 + dx,
+              y1: a.arrow.y1 + dy,
+              x2: a.arrow.x2 + dx,
+              y2: a.arrow.y2 + dy,
+            }
+          : undefined
+        return { ...a, rect: movedRect, arrow: movedArrow }
+      }),
+    })),
+
+  pushMoveHistory: () =>
+    set((state) => ({
+      ...pushHistory(state.history, state.historyIndex, state.annotations),
+    })),
 
   setItemNote: (id, note) =>
     set((state) => ({

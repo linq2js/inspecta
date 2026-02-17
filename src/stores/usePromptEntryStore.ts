@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { db } from '@/lib/db'
+import { fuzzyMatch, fuzzyScore } from '@/lib/fuzzyMatch'
 import type { PromptEntry, PromptEntryType, Folder, Tag } from '@/types'
 
 interface PromptEntryState {
@@ -7,12 +8,10 @@ interface PromptEntryState {
   folders: Folder[]
   tags: Tag[]
   loading: boolean
-  activeTab: PromptEntryType
   searchQuery: string
   selectedFolderId: number | null
   selectedTags: string[]
 
-  setActiveTab: (tab: PromptEntryType) => void
   setSearchQuery: (query: string) => void
   setSelectedFolderId: (id: number | null) => void
   setSelectedTags: (tags: string[]) => void
@@ -31,7 +30,7 @@ interface PromptEntryState {
   deleteEntry: (id: number) => Promise<void>
   duplicateEntry: (id: number) => Promise<number | undefined>
 
-  createFolder: (name: string, type: PromptEntryType) => Promise<number>
+  createFolder: (name: string) => Promise<number>
   renameFolder: (id: number, name: string) => Promise<void>
   deleteFolder: (id: number) => Promise<void>
   moveEntry: (entryId: number, folderId: number | null) => Promise<void>
@@ -43,7 +42,7 @@ interface PromptEntryState {
   exportAll: () => Promise<string>
   importFromJSON: (jsonStr: string) => Promise<number>
 
-  seedBuiltInTemplates: () => Promise<void>
+  seedBuiltInSnippets: () => Promise<void>
 
   getFilteredEntries: () => PromptEntry[]
 }
@@ -53,12 +52,10 @@ export const usePromptEntryStore = create<PromptEntryState>((set, get) => ({
   folders: [],
   tags: [],
   loading: false,
-  activeTab: 'snippet',
   searchQuery: '',
   selectedFolderId: null,
   selectedTags: [],
 
-  setActiveTab: (tab) => set({ activeTab: tab, searchQuery: '', selectedFolderId: null, selectedTags: [] }),
   setSearchQuery: (query) => set({ searchQuery: query }),
   setSelectedFolderId: (id) => set({ selectedFolderId: id }),
   setSelectedTags: (tags) => set({ selectedTags: tags }),
@@ -117,8 +114,8 @@ export const usePromptEntryStore = create<PromptEntryState>((set, get) => ({
     return newId as number
   },
 
-  createFolder: async (name, type) => {
-    const id = await db.folders.add({ name, type } as Folder)
+  createFolder: async (name) => {
+    const id = await db.folders.add({ name, type: 'snippet' } as Folder)
     await get().loadFolders()
     return id as number
   },
@@ -217,31 +214,36 @@ export const usePromptEntryStore = create<PromptEntryState>((set, get) => ({
     return count
   },
 
-  seedBuiltInTemplates: async () => {
-    const existing = await db.entries.where('isBuiltIn').equals(1).count()
-    if (existing > 0) return
+  seedBuiltInSnippets: async () => {
+    // Clean up duplicates first: keep only the oldest entry per title+isBuiltIn
+    const allEntries = await db.entries.toArray()
+    const seen = new Map<string, number>()
+    const dupeIds: number[] = []
+    for (const entry of allEntries) {
+      if (!entry.isBuiltIn) continue
+      const key = entry.title
+      if (seen.has(key)) {
+        dupeIds.push(entry.id!)
+      } else {
+        seen.set(key, entry.id!)
+      }
+    }
+    if (dupeIds.length > 0) {
+      await db.entries.bulkDelete(dupeIds)
+    }
+
+    // Only seed entries that don't already exist (by title)
+    const existingTitles = new Set(
+      allEntries.filter((e) => e.isBuiltIn).map((e) => e.title),
+    )
 
     const now = Date.now()
-    const templates: Omit<PromptEntry, 'id'>[] = [
+    const snippets: Omit<PromptEntry, 'id'>[] = [
       {
-        type: 'template',
-        title: 'Report Issues',
-        description: 'Describe UI bugs and visual issues for developers to fix.',
-        content: [
-          "# Bug Report",
-          "",
-          "I'm reporting UI issues{{#if hasImages}} on a screenshot (see attached annotated image){{/if}}.",
-          "",
-          "{{annotations}}",
-          "",
-          "## Additional Context",
-          "",
-          "<!-- Add platform version, device, screen context... -->",
-          "",
-          "---",
-          "",
-          "Please analyze each marked issue and suggest specific fixes.",
-        ].join('\n'),
+        type: 'snippet',
+        title: 'Bug Report Header',
+        description: 'Standard bug report intro paragraph.',
+        content: "I'm reporting UI issues on the attached screenshot. Please analyze each marked annotation and suggest specific fixes.\n",
         tags: ['built-in', 'bugs'],
         folderId: null,
         variables: [],
@@ -250,25 +252,23 @@ export const usePromptEntryStore = create<PromptEntryState>((set, get) => ({
         updatedAt: now,
       },
       {
-        type: 'template',
-        title: 'Refactor UI',
-        description: 'Request UI improvements, modernization, or redesign.',
-        content: [
-          "# UI Refactor Request",
-          "",
-          "I'd like to refactor and improve the UI{{#if hasImages}} shown in this screenshot (see attached annotated image){{/if}}.",
-          "",
-          "{{annotations}}",
-          "",
-          "## Additional Context",
-          "",
-          "<!-- Describe the improvements you want... -->",
-          "",
-          "---",
-          "",
-          "Please suggest modern UI/UX improvements for each area, including layout, spacing, typography, and visual hierarchy changes.",
-        ].join('\n'),
+        type: 'snippet',
+        title: 'Refactor Request',
+        description: 'UI refactor/improvement intro paragraph.',
+        content: "I'd like to refactor and improve the UI shown in this screenshot. Please suggest modern UI/UX improvements including layout, spacing, typography, and visual hierarchy changes.\n",
         tags: ['built-in', 'refactor'],
+        folderId: null,
+        variables: [],
+        isBuiltIn: true,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        type: 'snippet',
+        title: 'Additional Context',
+        description: 'Context section for platform/device info.',
+        content: "\n## Additional Context\n\n- Platform: \n- Browser/Device: \n- Screen size: \n",
+        tags: ['built-in'],
         folderId: null,
         variables: [],
         isBuiltIn: true,
@@ -277,18 +277,19 @@ export const usePromptEntryStore = create<PromptEntryState>((set, get) => ({
       },
     ]
 
-    for (const template of templates) {
-      await db.entries.add(template as PromptEntry)
+    const toAdd = snippets.filter((s) => !existingTitles.has(s.title))
+    for (const snippet of toAdd) {
+      await db.entries.add(snippet as PromptEntry)
     }
 
     await get().loadEntries()
   },
 
   getFilteredEntries: () => {
-    const { entries, activeTab, searchQuery, selectedFolderId, selectedTags } =
+    const { entries, searchQuery, selectedFolderId, selectedTags } =
       get()
 
-    let filtered = entries.filter((e) => e.type === activeTab)
+    let filtered = entries.filter((e) => e.type === 'snippet')
 
     if (selectedFolderId !== null) {
       filtered = filtered.filter((e) => e.folderId === selectedFolderId)
@@ -301,13 +302,28 @@ export const usePromptEntryStore = create<PromptEntryState>((set, get) => ({
     }
 
     if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase()
+      const q = searchQuery.trim()
       filtered = filtered.filter(
         (e) =>
-          e.title.toLowerCase().includes(q) ||
-          e.description.toLowerCase().includes(q) ||
-          e.content.toLowerCase().includes(q),
+          fuzzyMatch(q, e.title) ||
+          fuzzyMatch(q, e.description) ||
+          fuzzyMatch(q, e.content),
       )
+
+      // Sort by best fuzzy score (title weighted highest, then description)
+      return filtered.sort((a, b) => {
+        const scoreA = Math.max(
+          fuzzyScore(q, a.title) * 2,
+          fuzzyScore(q, a.description),
+          fuzzyScore(q, a.content) * 0.5,
+        )
+        const scoreB = Math.max(
+          fuzzyScore(q, b.title) * 2,
+          fuzzyScore(q, b.description),
+          fuzzyScore(q, b.content) * 0.5,
+        )
+        return scoreB - scoreA
+      })
     }
 
     return filtered.sort((a, b) => b.updatedAt - a.updatedAt)

@@ -1,12 +1,11 @@
 import { useState, useCallback } from 'react'
 import { Button } from '@/components/atoms/Button'
 import { Icon } from '@/components/atoms/Icon'
-import type { PromptEntry, PromptEntryType, PromptVariable } from '@/types'
+import type { PromptEntry, PromptVariable } from '@/types'
 import { syncVariablesFromContent } from '@/lib/variables'
 
 interface PromptEntryEditorProps {
   entry?: PromptEntry
-  type: PromptEntryType
   onSave: (data: {
     title: string
     description: string
@@ -20,7 +19,6 @@ interface PromptEntryEditorProps {
 
 export function PromptEntryEditor({
   entry,
-  type,
   onSave,
   onCancel,
   existingTags,
@@ -78,7 +76,7 @@ export function PromptEntryEditor({
     })
   }
 
-  const typeLabel = type === 'template' ? 'Template' : 'Snippet'
+  const typeLabel = 'Snippet'
 
   return (
     <form onSubmit={handleSubmit} className="flex h-full flex-col gap-4 p-4">

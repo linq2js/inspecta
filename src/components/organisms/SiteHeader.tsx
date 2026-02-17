@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/80 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/80">
-      <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between px-4 sm:px-6">
+      <div className="flex h-14 items-center justify-between px-3">
         <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2">
             <svg
@@ -27,7 +27,7 @@ export function SiteHeader() {
               to="/"
               className="rounded-md px-3 py-1.5 text-sm text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 [&.active]:text-primary-600 [&.active]:dark:text-primary-400"
             >
-              Prompt Editor
+              Home
             </Link>
             <Link
               to="/components"

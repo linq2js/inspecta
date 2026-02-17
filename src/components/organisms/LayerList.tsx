@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 import { IndexBadge } from '@/components/atoms/IndexBadge'
 import { Icon } from '@/components/atoms/Icon'
 import { useImageStore } from '@/stores/useImageStore'
+import { useAnnotationStore } from '@/stores/useAnnotationStore'
 
 export function LayerList() {
   const {
@@ -13,7 +14,9 @@ export function LayerList() {
     setImageNote,
     showImageIds,
     setShowImageIds,
+    resetImages,
   } = useImageStore()
+  const { resetAnnotations } = useAnnotationStore()
 
   const [dragIdx, setDragIdx] = useState<number | null>(null)
   const [overIdx, setOverIdx] = useState<number | null>(null)
@@ -85,6 +88,24 @@ export function LayerList() {
               Deselect
             </button>
           )}
+          <button
+            type="button"
+            onClick={() => {
+              if (
+                !window.confirm(
+                  'Remove all images and annotations? This cannot be undone.',
+                )
+              )
+                return
+              resetImages()
+              resetAnnotations()
+            }}
+            title="Remove all images and annotations"
+            className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-red-500 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-red-400"
+          >
+            <Icon name="trash" size={10} />
+            Clear all
+          </button>
           {images.length > 1 && (
             <button
               type="button"

@@ -3,10 +3,25 @@ import type { UnifiedItem, ImageEntry } from '@/types'
 
 export type AppMode = 'edit' | 'preview'
 
+const STORAGE_KEY = 'prompt-assistant-content'
+
+function loadPersistedContent(): string {
+  try {
+    return localStorage.getItem(STORAGE_KEY) ?? ''
+  } catch {
+    return ''
+  }
+}
+
 interface PromptState {
   markdownContent: string
   appMode: AppMode
   showPreview: boolean
+
+  /** Registered by MarkdownEditor — inserts text at the current caret position */
+  insertAtCursor: ((text: string) => void) | null
+  registerInsertAtCursor: (fn: (text: string) => void) => void
+  unregisterInsertAtCursor: () => void
 
   setMarkdownContent: (content: string) => void
   setAppMode: (mode: AppMode) => void
@@ -16,9 +31,13 @@ interface PromptState {
 }
 
 export const usePromptStore = create<PromptState>((set) => ({
-  markdownContent: '',
+  markdownContent: loadPersistedContent(),
   appMode: 'edit',
   showPreview: false,
+  insertAtCursor: null,
+
+  registerInsertAtCursor: (fn) => set({ insertAtCursor: fn }),
+  unregisterInsertAtCursor: () => set({ insertAtCursor: null }),
 
   setMarkdownContent: (content) => set({ markdownContent: content }),
 
@@ -38,6 +57,15 @@ export const usePromptStore = create<PromptState>((set) => ({
       showPreview: false,
     }),
 }))
+
+// Persist markdownContent to localStorage on change
+usePromptStore.subscribe((state, prevState) => {
+  if (state.markdownContent !== prevState.markdownContent) {
+    try {
+      localStorage.setItem(STORAGE_KEY, state.markdownContent)
+    } catch { /* quota exceeded — ignore */ }
+  }
+})
 
 // ── Prompt Generation Helpers ──
 
@@ -66,47 +94,6 @@ export function buildAnnotationBlock(
     lines += '\n'
   }
   return lines
-}
-
-export function generateReportIssuesTemplate(
-  items: UnifiedItem[],
-  compositeDims: { w: number; h: number } | null,
-): string {
-  const hasImages = compositeDims !== null
-  let prompt = "# Bug Report\n\nI'm reporting UI issues"
-  if (hasImages) {
-    prompt += ' on a screenshot (see attached annotated image)'
-  }
-  prompt += '.\n'
-
-  if (hasImages && items.length > 0) {
-    prompt += buildAnnotationBlock(items, compositeDims)
-  }
-
-  prompt += '\n## Additional Context\n\n<!-- Add platform version, device, screen context... -->\n'
-  prompt += '\n---\n\nPlease analyze each marked issue and suggest specific fixes.\n'
-  return prompt
-}
-
-export function generateRefactorUITemplate(
-  items: UnifiedItem[],
-  compositeDims: { w: number; h: number } | null,
-): string {
-  const hasImages = compositeDims !== null
-  let prompt = "# UI Refactor Request\n\nI'd like to refactor and improve the UI"
-  if (hasImages) {
-    prompt += ' shown in this screenshot (see attached annotated image)'
-  }
-  prompt += '.\n'
-
-  if (hasImages && items.length > 0) {
-    prompt += buildAnnotationBlock(items, compositeDims)
-  }
-
-  prompt += '\n## Additional Context\n\n<!-- Describe the improvements you want... -->\n'
-  prompt +=
-    '\n---\n\nPlease suggest modern UI/UX improvements for each area, including layout, spacing, typography, and visual hierarchy changes.\n'
-  return prompt
 }
 
 /**

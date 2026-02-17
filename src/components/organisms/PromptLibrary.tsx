@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Button } from '@/components/atoms/Button'
 import { Icon } from '@/components/atoms/Icon'
 import { PromptEntryCard } from '@/components/molecules/PromptEntryCard'
 import { PromptEntryEditor } from '@/components/molecules/PromptEntryEditor'
@@ -8,7 +7,7 @@ import { usePromptEntryStore } from '@/stores/usePromptEntryStore'
 import { usePromptStore } from '@/stores/usePromptStore'
 import { useToastStore } from '@/stores/useToastStore'
 import { extractVariables, substituteVariables } from '@/lib/variables'
-import type { PromptEntry, PromptEntryType, PromptVariable } from '@/types'
+import type { PromptEntry, PromptVariable } from '@/types'
 
 interface PromptLibraryProps {
   isOpen: boolean
@@ -17,8 +16,6 @@ interface PromptLibraryProps {
 
 export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
   const {
-    activeTab,
-    setActiveTab,
     searchQuery,
     setSearchQuery,
     folders,
@@ -36,38 +33,41 @@ export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
     duplicateEntry,
     createFolder,
     deleteFolder,
-    seedBuiltInTemplates,
+    seedBuiltInSnippets,
     getFilteredEntries,
     exportByType,
     exportAll,
     importFromJSON,
   } = usePromptEntryStore()
 
-  const { markdownContent, setMarkdownContent } = usePromptStore()
+  const { insertAtCursor, markdownContent, setMarkdownContent } = usePromptStore()
   const addToast = useToastStore((s) => s.addToast)
 
   const [editingEntry, setEditingEntry] = useState<PromptEntry | null>(null)
   const [isCreating, setIsCreating] = useState(false)
   const [variableEntry, setVariableEntry] = useState<PromptEntry | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
-  // Initialize on first open
+  // Initialize on open: seed, load, reset search, focus
   useEffect(() => {
     if (!isOpen) return
     const init = async () => {
-      await seedBuiltInTemplates()
+      await seedBuiltInSnippets()
       await loadEntries()
       await loadFolders()
       await loadTags()
     }
     init()
+    setSearchQuery('')
+    requestAnimationFrame(() => searchInputRef.current?.focus())
   }, [isOpen])
 
   const entries = getFilteredEntries()
-  const tabFolders = folders.filter((f) => f.type === activeTab)
+  const snippetFolders = folders.filter((f) => f.type === 'snippet')
   const existingTagNames = tags.map((t) => t.name)
 
-  const handleInsert = useCallback(
+  const doInsert = useCallback(
     (entry: PromptEntry) => {
       const vars = extractVariables(entry.content)
       if (vars.length > 0 && entry.variables.length > 0) {
@@ -75,23 +75,15 @@ export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
         return
       }
 
-      if (entry.type === 'template') {
-        if (
-          markdownContent.trim() &&
-          !window.confirm(
-            'This will replace your current prompt. Continue?',
-          )
-        )
-          return
-        setMarkdownContent(entry.content)
-        addToast({ message: `Applied template: ${entry.title}` })
+      if (insertAtCursor) {
+        insertAtCursor(entry.content)
       } else {
         setMarkdownContent(markdownContent + entry.content)
-        addToast({ message: `Inserted snippet: ${entry.title}` })
       }
+      addToast({ message: `Inserted: ${entry.title}` })
       onClose()
     },
-    [markdownContent, setMarkdownContent, addToast, onClose],
+    [insertAtCursor, markdownContent, setMarkdownContent, addToast, onClose],
   )
 
   const handleVariableConfirm = useCallback(
@@ -99,18 +91,38 @@ export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
       if (!variableEntry) return
       const resolved = substituteVariables(variableEntry.content, values)
 
-      if (variableEntry.type === 'template') {
-        setMarkdownContent(resolved)
-        addToast({ message: `Applied template: ${variableEntry.title}` })
+      if (insertAtCursor) {
+        insertAtCursor(resolved)
       } else {
         setMarkdownContent(markdownContent + resolved)
-        addToast({ message: `Inserted snippet: ${variableEntry.title}` })
       }
+      addToast({ message: `Inserted: ${variableEntry.title}` })
 
       setVariableEntry(null)
       onClose()
     },
-    [variableEntry, markdownContent, setMarkdownContent, addToast, onClose],
+    [variableEntry, insertAtCursor, markdownContent, setMarkdownContent, addToast, onClose],
+  )
+
+  const handleSearchKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        if (entries.length > 0) {
+          doInsert(entries[0])
+        }
+        return
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        if (searchQuery) {
+          setSearchQuery('')
+        } else {
+          onClose()
+        }
+      }
+    },
+    [entries, doInsert, searchQuery, setSearchQuery, onClose],
   )
 
   const handleSave = useCallback(
@@ -123,20 +135,20 @@ export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
     }) => {
       if (editingEntry?.id) {
         await updateEntry(editingEntry.id, data)
-        addToast({ message: 'Entry updated' })
+        addToast({ message: 'Snippet updated' })
       } else {
         await createEntry({
           ...data,
-          type: activeTab,
+          type: 'snippet',
           folderId: null,
           isBuiltIn: false,
         })
-        addToast({ message: `${activeTab === 'template' ? 'Template' : 'Snippet'} created` })
+        addToast({ message: 'Snippet created' })
       }
       setEditingEntry(null)
       setIsCreating(false)
     },
-    [editingEntry, activeTab, updateEntry, createEntry, addToast],
+    [editingEntry, updateEntry, createEntry, addToast],
   )
 
   const handleDelete = useCallback(
@@ -144,7 +156,7 @@ export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
       if (entry.isBuiltIn) return
       if (!window.confirm(`Delete "${entry.title}"?`)) return
       await deleteEntry(entry.id!)
-      addToast({ message: 'Entry deleted' })
+      addToast({ message: 'Snippet deleted' })
     },
     [deleteEntry, addToast],
   )
@@ -158,16 +170,16 @@ export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
   )
 
   const handleExport = useCallback(async () => {
-    const json = await exportByType(activeTab)
+    const json = await exportByType('snippet')
     const blob = new Blob([json], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `prompt-${activeTab}s-export.json`
+    a.download = 'prompt-snippets-export.json'
     a.click()
     URL.revokeObjectURL(url)
-    addToast({ message: `${activeTab}s exported` })
-  }, [activeTab, exportByType, addToast])
+    addToast({ message: 'Snippets exported' })
+  }, [exportByType, addToast])
 
   const handleExportAll = useCallback(async () => {
     const json = await exportAll()
@@ -200,9 +212,9 @@ export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
   const handleNewFolder = useCallback(async () => {
     const name = window.prompt('Folder name:')
     if (!name?.trim()) return
-    await createFolder(name.trim(), activeTab)
+    await createFolder(name.trim())
     addToast({ message: 'Folder created' })
-  }, [activeTab, createFolder, addToast])
+  }, [createFolder, addToast])
 
   if (!isOpen) return null
 
@@ -212,7 +224,6 @@ export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
       <div className="fixed inset-y-0 right-0 z-40 w-full max-w-lg border-l border-zinc-200 bg-white shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
         <PromptEntryEditor
           entry={editingEntry ?? undefined}
-          type={activeTab}
           onSave={handleSave}
           onCancel={() => {
             setEditingEntry(null)
@@ -237,7 +248,7 @@ export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
         {/* Header */}
         <div className="flex shrink-0 items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-700">
           <h2 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-            Prompt Library
+            Snippet Library
           </h2>
           <button
             type="button"
@@ -248,40 +259,17 @@ export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex shrink-0 border-b border-zinc-200 dark:border-zinc-700">
-          {(['snippet', 'template'] as PromptEntryType[]).map((tab) => (
-            <button
-              key={tab}
-              type="button"
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 px-4 py-2.5 text-sm font-medium transition-colors ${
-                activeTab === tab
-                  ? 'border-b-2 border-primary-600 text-primary-600 dark:border-primary-400 dark:text-primary-400'
-                  : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'
-              }`}
-            >
-              {tab === 'snippet' ? 'Snippets' : 'Templates'}
-            </button>
-          ))}
-        </div>
-
-        {/* Toolbar */}
+        {/* Search toolbar */}
         <div className="flex shrink-0 items-center gap-2 border-b border-zinc-200 px-4 py-2 dark:border-zinc-700">
           <input
+            ref={searchInputRef}
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search..."
+            onKeyDown={handleSearchKeyDown}
+            placeholder="Search snippets… (Enter to insert, Esc to clear)"
             className="flex-1 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-xs outline-none focus:ring-2 focus:ring-primary-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200"
           />
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => setIsCreating(true)}
-          >
-            + New
-          </Button>
         </div>
 
         {/* Body */}
@@ -299,7 +287,7 @@ export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
             >
               All
             </button>
-            {tabFolders.map((f) => (
+            {snippetFolders.map((f) => (
               <div key={f.id} className="flex items-center gap-1">
                 <button
                   type="button"
@@ -363,15 +351,22 @@ export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
               </>
             )}
 
-            {/* Import/Export */}
+            {/* Actions */}
             <div className="my-2 h-px bg-zinc-200 dark:bg-zinc-700" />
             <div className="space-y-1">
+              <button
+                type="button"
+                onClick={() => setIsCreating(true)}
+                className="block w-full rounded px-2 py-1 text-left text-xs text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              >
+                New snippet
+              </button>
               <button
                 type="button"
                 onClick={handleExport}
                 className="block w-full rounded px-2 py-1 text-left text-xs text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
               >
-                Export {activeTab}s
+                Export snippets
               </button>
               <button
                 type="button"
@@ -405,7 +400,7 @@ export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
                   <PromptEntryCard
                     key={entry.id}
                     entry={entry}
-                    onInsert={handleInsert}
+                    onInsert={doInsert}
                     onEdit={(e) => setEditingEntry(e)}
                     onDuplicate={handleDuplicate}
                     onDelete={handleDelete}
@@ -416,7 +411,7 @@ export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
               <p className="py-12 text-center text-sm text-zinc-400 dark:text-zinc-500">
                 {searchQuery
                   ? 'No results found.'
-                  : `No ${activeTab}s yet. Create one to get started.`}
+                  : 'No snippets yet. Create one to get started.'}
               </p>
             )}
           </div>
@@ -429,7 +424,7 @@ export function PromptLibrary({ isOpen, onClose }: PromptLibraryProps) {
           variables={variableEntry.variables}
           onConfirm={handleVariableConfirm}
           onCancel={() => setVariableEntry(null)}
-          actionLabel={variableEntry.type === 'template' ? 'Apply' : 'Insert'}
+          actionLabel="Insert"
         />
       )}
     </>

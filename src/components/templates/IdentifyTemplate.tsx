@@ -118,7 +118,7 @@ export function IdentifyTemplate() {
   const hasImages = images.length > 0
 
   return (
-    <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
+    <div className="px-3 py-4">
       {/* Header */}
       <div className="mb-4 flex items-start justify-between">
         <div>

@@ -142,25 +142,6 @@ export function IdentifyToolbar() {
 
           <div className="h-6 w-px bg-zinc-200 dark:bg-zinc-700" />
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              if (
-                !window.confirm(
-                  'Remove all images and annotations? This cannot be undone.',
-                )
-              )
-                return
-              resetImages()
-              resetAnnotations()
-            }}
-            title="Remove all images and annotations"
-          >
-            <Icon name="trash" size={14} />
-            Remove Image
-          </Button>
-
           <Button variant="ghost" size="sm" onClick={handleReset}>
             Reset
           </Button>

@@ -11,7 +11,7 @@ const MIN_ZOOM = 0.5
 const MAX_ZOOM = 5
 const ZOOM_STEP = 0.2
 
-type InteractionMode = 'idle' | 'drawing' | 'panning' | 'moving'
+type InteractionMode = 'idle' | 'drawing' | 'panning' | 'moving' | 'dragging-annotation'
 
 export function ImageCanvas() {
   const { images, canvasBounds, selectedLayerId, setSelectedLayer, moveLayer, showImageIds } =
@@ -25,11 +25,15 @@ export function ImageCanvas() {
     addLineAnnotation,
     addBlurAnnotation,
     removeAnnotation,
+    moveAnnotation,
+    pushMoveHistory,
     drawingTool,
     setDrawingTool,
     undo,
     redo,
   } = useAnnotationStore()
+
+  const items = getUnifiedList()
 
   const compositeDims =
     canvasBounds.totalWidth > 0
@@ -75,7 +79,13 @@ export function ImageCanvas() {
     clientY: number
   } | null>(null)
 
-  const items = getUnifiedList()
+  // Annotation badge drag state — uses DOM transforms for performance
+  const annotDragStart = useRef<{
+    annotId: string
+    startClientX: number
+    startClientY: number
+  } | null>(null)
+  const annotDragOffset = useRef({ dx: 0, dy: 0 })
 
   // Measure container width
   useEffect(() => {
@@ -88,7 +98,7 @@ export function ImageCanvas() {
     return () => ro.disconnect()
   }, [])
 
-  // Compute fit scale based on composite dimensions
+  // Update fit scale whenever composite dimensions change
   useEffect(() => {
     if (!compositeDims || containerSize.w <= 0) return
     const MAX_H = 600
@@ -99,6 +109,19 @@ export function ImageCanvas() {
       1,
     )
     setFitScale(s)
+  }, [compositeDims?.w, compositeDims?.h, containerSize.w])
+
+  // Reset zoom and re-center only when images are added/removed
+  const imageCount = images.length
+  useEffect(() => {
+    if (!compositeDims || containerSize.w <= 0) return
+    const MAX_H = 600
+    const availW = containerSize.w
+    const s = Math.min(
+      availW / compositeDims.w,
+      MAX_H / compositeDims.h,
+      1,
+    )
     setZoom(1)
     requestAnimationFrame(() => {
       const el = containerRef.current
@@ -112,7 +135,8 @@ export function ImageCanvas() {
         y: Math.max(0, (ch - ih) / 2),
       })
     })
-  }, [compositeDims?.w, compositeDims?.h, containerSize.w])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imageCount, containerSize.w])
 
   const effectiveScale = fitScale * zoom
   const displayW = compositeDims ? compositeDims.w * effectiveScale : 0
@@ -140,14 +164,8 @@ export function ImageCanvas() {
       const offsetX = clientX - rect.left - BADGE_PAD - pan.x
       const offsetY = clientY - rect.top - BADGE_PAD - pan.y
       return {
-        px: Math.max(
-          0,
-          Math.min(compositeDims.w, offsetX / effectiveScale),
-        ),
-        py: Math.max(
-          0,
-          Math.min(compositeDims.h, offsetY / effectiveScale),
-        ),
+        px: Math.max(0, Math.min(compositeDims.w, offsetX / effectiveScale)),
+        py: Math.max(0, Math.min(compositeDims.h, offsetY / effectiveScale)),
       }
     },
     [effectiveScale, compositeDims, pan],
@@ -242,6 +260,44 @@ export function ImageCanvas() {
         return
       }
 
+      if (mode === 'dragging-annotation' && annotDragStart.current && compositeDims) {
+        const rawDx = (e.clientX - annotDragStart.current.startClientX) / effectiveScale
+        const rawDy = (e.clientY - annotDragStart.current.startClientY) / effectiveScale
+        const id = annotDragStart.current.annotId
+        const item = items.find((i) => i.id === id)
+
+        let clampedDx = rawDx
+        let clampedDy = rawDy
+        if (item) {
+          if ((item.kind === 'arrow' || item.kind === 'line') && item.arrow) {
+            // Clamp so no endpoint goes outside bounds
+            const minDx = Math.max(-item.arrow.x1, -item.arrow.x2)
+            const maxDx = Math.min(compositeDims.w - item.arrow.x1, compositeDims.w - item.arrow.x2)
+            const minDy = Math.max(-item.arrow.y1, -item.arrow.y2)
+            const maxDy = Math.min(compositeDims.h - item.arrow.y1, compositeDims.h - item.arrow.y2)
+            clampedDx = Math.max(minDx, Math.min(maxDx, rawDx))
+            clampedDy = Math.max(minDy, Math.min(maxDy, rawDy))
+          } else {
+            // Clamp so box stays within bounds
+            clampedDx = Math.max(-item.rect.x, Math.min(compositeDims.w - item.rect.x - item.rect.width, rawDx))
+            clampedDy = Math.max(-item.rect.y, Math.min(compositeDims.h - item.rect.y - item.rect.height, rawDy))
+          }
+        }
+
+        annotDragOffset.current = { dx: clampedDx, dy: clampedDy }
+        const pxDx = clampedDx * effectiveScale
+        const pxDy = clampedDy * effectiveScale
+
+        // Apply visual transform directly to DOM — no React re-render
+        const el = containerRef.current
+        if (el) {
+          el.querySelectorAll<HTMLElement | SVGElement>(`[data-annot-drag="${id}"]`).forEach((node) => {
+            ;(node as HTMLElement).style.transform = `translate(${pxDx}px, ${pxDy}px)`
+          })
+        }
+        return
+      }
+
       if (colorPicker.active) {
         const { px, py } = toPixelCoords(e.clientX, e.clientY)
         colorPicker.onHover(px, py)
@@ -256,13 +312,32 @@ export function ImageCanvas() {
         )
       }
     },
-    [mode, drawing, toPixelCoords, colorPicker, selectedLayerId, effectiveScale, moveLayer],
+    [mode, drawing, toPixelCoords, colorPicker, selectedLayerId, effectiveScale, moveLayer, items, compositeDims],
   )
 
   const handleMouseUp = useCallback((e?: React.MouseEvent) => {
     if (mode === 'panning') {
       setMode('idle')
       panStart.current = null
+      return
+    }
+    if (mode === 'dragging-annotation' && annotDragStart.current) {
+      const { dx, dy } = annotDragOffset.current
+      const id = annotDragStart.current.annotId
+      // Clear DOM transforms before committing to store
+      const el = containerRef.current
+      if (el) {
+        el.querySelectorAll<HTMLElement | SVGElement>(`[data-annot-drag="${id}"]`).forEach((node) => {
+          ;(node as HTMLElement).style.transform = ''
+        })
+      }
+      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+        moveAnnotation(id, dx, dy)
+        pushMoveHistory()
+      }
+      annotDragStart.current = null
+      annotDragOffset.current = { dx: 0, dy: 0 }
+      setMode('idle')
       return
     }
     if (mode === 'moving') {
@@ -324,7 +399,7 @@ export function ImageCanvas() {
     setDrawing(null)
     setShiftHeld(false)
     setMode('idle')
-  }, [mode, drawing, addAnnotation, addArrowAnnotation, addLineAnnotation, addBlurAnnotation, drawingTool, compositeDims, colorPicker.active, shiftHeld])
+  }, [mode, drawing, addAnnotation, addArrowAnnotation, addLineAnnotation, addBlurAnnotation, drawingTool, compositeDims, colorPicker.active, shiftHeld, pushMoveHistory, moveAnnotation, items])
 
   // ── Wheel: Figma-style scroll/zoom ──
 
@@ -433,6 +508,22 @@ export function ImageCanvas() {
     setDrawingTool,
   ])
 
+  const handleBadgeMouseDown = useCallback(
+    (e: React.MouseEvent, annotId: string) => {
+      e.stopPropagation()
+      e.preventDefault()
+      setSelected(annotId)
+      setMode('dragging-annotation')
+      annotDragStart.current = {
+        annotId,
+        startClientX: e.clientX,
+        startClientY: e.clientY,
+      }
+      annotDragOffset.current = { dx: 0, dy: 0 }
+    },
+    [setSelected],
+  )
+
   if (images.length === 0) return null
 
   const toDisplay = (px: number) => px * effectiveScale
@@ -440,6 +531,7 @@ export function ImageCanvas() {
   const getCursor = () => {
     if (mode === 'panning') return 'grabbing'
     if (mode === 'moving') return 'grabbing'
+    if (mode === 'dragging-annotation') return 'grabbing'
     if (colorPicker.active) return 'crosshair'
     if (selectedLayerId) return 'grab'
     return 'crosshair'
@@ -454,7 +546,7 @@ export function ImageCanvas() {
           onClick={() =>
             setZoom((z) => Math.max(MIN_ZOOM, z - ZOOM_STEP))
           }
-          className="flex h-6 items-center justify-center rounded border border-zinc-300 px-1.5 hover:bg-zinc-100 dark:border-zinc-600 dark:hover:bg-zinc-800"
+          className="flex h-6 w-6 items-center justify-center rounded border border-zinc-300 hover:bg-zinc-100 dark:border-zinc-600 dark:hover:bg-zinc-800"
         >
           −
         </button>
@@ -466,7 +558,7 @@ export function ImageCanvas() {
           onClick={() =>
             setZoom((z) => Math.min(MAX_ZOOM, z + ZOOM_STEP))
           }
-          className="flex h-6 items-center justify-center rounded border border-zinc-300 px-1.5 hover:bg-zinc-100 dark:border-zinc-600 dark:hover:bg-zinc-800"
+          className="flex h-6 w-6 items-center justify-center rounded border border-zinc-300 hover:bg-zinc-100 dark:border-zinc-600 dark:hover:bg-zinc-800"
         >
           +
         </button>
@@ -591,7 +683,7 @@ export function ImageCanvas() {
                   ? 'Drag to draw line · Shift to snap · Esc to switch back to box'
                   : drawingTool === 'blur'
                     ? 'Drag to draw blur box · Esc to switch back to box'
-                  : `${/Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘V' : 'Ctrl+V'} to paste · Scroll to pan · ${/Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘' : 'Ctrl'}+scroll to zoom`}
+                  : `Drag badge to move · ${/Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘V' : 'Ctrl+V'} to paste · Scroll to pan`}
         </span>
       </div>
 
@@ -680,7 +772,7 @@ export function ImageCanvas() {
                 ? dy - 2 - badgeSize / 2
                 : dy + badgeSize / 2 + 4 - badgeSize / 2
               return (
-                <div key={`blur-${item.id}`}>
+                <div key={`blur-${item.id}`} data-annot-drag={item.id}>
                   {/* Blur overlay */}
                   <div
                     onClick={(e) => {
@@ -704,9 +796,10 @@ export function ImageCanvas() {
                       zIndex: 1,
                     }}
                   />
-                  {/* Badge — rendered above blur overlay */}
+                  {/* Badge — rendered above blur overlay, draggable */}
                   <div
-                    className="pointer-events-none absolute flex items-center justify-center rounded-full"
+                    onMouseDown={(e) => handleBadgeMouseDown(e, item.id)}
+                    className="absolute flex items-center justify-center rounded-full"
                     style={{
                       left: badgeLeft,
                       top: badgeTop,
@@ -718,6 +811,7 @@ export function ImageCanvas() {
                       fontWeight: 700,
                       lineHeight: 1,
                       zIndex: 3,
+                      cursor: 'grab',
                     }}
                   >
                     {item.index}
@@ -775,6 +869,7 @@ export function ImageCanvas() {
                 return (
                   <g
                     key={item.id}
+                    data-annot-drag={item.id}
                     onClick={(e) => {
                       e.stopPropagation()
                       setSelected(item.id)
@@ -800,17 +895,23 @@ export function ImageCanvas() {
                       markerEnd={item.kind === 'arrow' ? 'url(#arrowhead)' : undefined}
                       style={isSelected ? { animation: 'marching-ants 0.4s linear infinite' } : undefined}
                     />
-                    <circle cx={ax1} cy={ay1} r={badgeR} fill={color} />
-                    <text
-                      x={ax1}
-                      y={ay1 + 4}
-                      textAnchor="middle"
-                      fontSize="11"
-                      fontWeight="bold"
-                      fill="white"
+                    <g
+                      onMouseDown={(e) => handleBadgeMouseDown(e, item.id)}
+                      style={{ cursor: 'grab' }}
                     >
-                      {item.index}
-                    </text>
+                      <circle cx={ax1} cy={ay1} r={badgeR} fill={color} />
+                      <text
+                        x={ax1}
+                        y={ay1 + 4}
+                        textAnchor="middle"
+                        fontSize="11"
+                        fontWeight="bold"
+                        fill="white"
+                        style={{ pointerEvents: 'none' }}
+                      >
+                        {item.index}
+                      </text>
+                    </g>
                   </g>
                 )
               }
@@ -823,6 +924,7 @@ export function ImageCanvas() {
               return (
                 <g
                   key={item.id}
+                  data-annot-drag={item.id}
                   onClick={(e) => {
                     e.stopPropagation()
                     setSelected(item.id)
@@ -841,34 +943,36 @@ export function ImageCanvas() {
                     rx={3}
                     style={isSelected ? { animation: 'marching-ants 0.4s linear infinite' } : undefined}
                   />
-                  <g>
-                    {(() => {
-                      const badgeR = 10
-                      const fitsAbove = dy - 2 - badgeR >= 0
-                      const bx = dx + 12
-                      const by = fitsAbove ? dy - 2 : dy + badgeR + 4
-                      return (
-                        <>
-                          <circle
-                            cx={bx}
-                            cy={by}
-                            r={badgeR}
-                            fill={color}
-                          />
-                          <text
-                            x={bx}
-                            y={by + 4}
-                            textAnchor="middle"
-                            fontSize="11"
-                            fontWeight="bold"
-                            fill="white"
-                          >
-                            {item.index}
-                          </text>
-                        </>
-                      )
-                    })()}
-                  </g>
+                  {(() => {
+                    const badgeR = 10
+                    const fitsAbove = dy - 2 - badgeR >= 0
+                    const bx = dx + 12
+                    const by = fitsAbove ? dy - 2 : dy + badgeR + 4
+                    return (
+                      <g
+                        onMouseDown={(e) => handleBadgeMouseDown(e, item.id)}
+                        style={{ cursor: 'grab' }}
+                      >
+                        <circle
+                          cx={bx}
+                          cy={by}
+                          r={badgeR}
+                          fill={color}
+                        />
+                        <text
+                          x={bx}
+                          y={by + 4}
+                          textAnchor="middle"
+                          fontSize="11"
+                          fontWeight="bold"
+                          fill="white"
+                          style={{ pointerEvents: 'none' }}
+                        >
+                          {item.index}
+                        </text>
+                      </g>
+                    )
+                  })()}
                 </g>
               )
             })}
@@ -877,20 +981,21 @@ export function ImageCanvas() {
             {items
               .filter((item) => item.kind === 'blur' && item.id === selectedItemId)
               .map((item) => (
-                <rect
-                  key={`blur-sel-${item.id}`}
-                  x={toDisplay(item.rect.x)}
-                  y={toDisplay(item.rect.y)}
-                  width={toDisplay(item.rect.width)}
-                  height={toDisplay(item.rect.height)}
-                  fill="none"
-                  stroke="#3b82f6"
-                  strokeWidth={3}
-                  strokeDasharray="6 3"
-                  rx={3}
-                  style={{ animation: 'marching-ants 0.4s linear infinite' }}
-                  pointerEvents="none"
-                />
+                <g key={`blur-sel-${item.id}`} data-annot-drag={item.id}>
+                  <rect
+                    x={toDisplay(item.rect.x)}
+                    y={toDisplay(item.rect.y)}
+                    width={toDisplay(item.rect.width)}
+                    height={toDisplay(item.rect.height)}
+                    fill="none"
+                    stroke="#3b82f6"
+                    strokeWidth={3}
+                    strokeDasharray="6 3"
+                    rx={3}
+                    style={{ animation: 'marching-ants 0.4s linear infinite' }}
+                    pointerEvents="none"
+                  />
+                </g>
               ))}
 
             {/* Drawing preview */}

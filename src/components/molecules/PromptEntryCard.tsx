@@ -67,7 +67,7 @@ export function PromptEntryCard({
           onClick={() => onInsert(entry)}
           className="rounded px-2 py-1 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/20"
         >
-          {entry.type === 'template' ? 'Apply' : 'Insert'}
+          Insert
         </button>
         <button
           type="button"
